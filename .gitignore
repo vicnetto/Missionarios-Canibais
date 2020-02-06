@@ -6,3 +6,9 @@ files/executavel*
 # This will ignore all the hpp files of SFML.
 sfml-hpp/
 
+# This are some objects files that will now be ignored.
+files/auxiliares.o
+files/jogo.o
+files/main.o
+
+

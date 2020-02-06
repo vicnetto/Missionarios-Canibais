@@ -1,12 +1,14 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+
 #include "jogo.h"
+#include "auxiliares.h"
 
 int main () {
 
     Jogo jogo;
 
-    jogo.window.create(sf::VideoMode(1920, 1080), "Missionarios e Canibais", sf::Style::Fullscreen);
+    jogo.window.create(sf::VideoMode(WIDTH, HEIGHT), "Missionarios e Canibais", sf::Style::Default);
 
     jogo.mainMenu();
 
