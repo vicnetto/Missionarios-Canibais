@@ -1,0 +1,8 @@
+# Placing some files that will be ignored by git. This files are just for my organization, in most of the cases.
+
+# Ignoring the executable linux file, just for organization.
+files/executavel*
+
+# This will ignore all the hpp files of SFML.
+sfml-hpp/
+
