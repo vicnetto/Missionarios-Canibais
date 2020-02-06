@@ -16,10 +16,30 @@ bool Phrase::setFont(std::string way) {
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
-        exit;
+        return 1;
     }
 
     text.setFont(font);
+
+    return true;
+}
+
+Sprites::Sprites(sf::Vector2f size, sf::Vector2f position)
+{
+    sprite.setScale(size);
+    sprite.setPosition(position);
+}
+
+bool Sprites::setTexture (std::string way) {
+
+    if (!texture.loadFromFile(way))
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
+
+        return false;
+    }
+
+    sprite.setTexture(texture);
 
     return true;
 }

@@ -17,7 +17,8 @@ FUNÇÕES PÚBLICAS:
 - bool setFont -> Tem como parâmetro o caminho até o arquivo, onde tenta aplicar essa fonte para o texto.
 
 */
-class Phrase {
+class Phrase 
+{
     public:
         sf::Text text;
         sf::Font font;
@@ -25,5 +26,15 @@ class Phrase {
     public:
         Phrase(std::string phrase, int size, sf::Color color, sf::Vector2f position);
         bool setFont (std::string way);
+};
 
+class Sprites
+{
+    public:
+        sf::Sprite sprite;
+        sf::Texture texture;
+
+    public:
+        Sprites(sf::Vector2f size, sf::Vector2f position);
+        bool setTexture (std::string way);
 };
