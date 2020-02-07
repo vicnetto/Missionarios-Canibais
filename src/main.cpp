@@ -6,7 +6,7 @@
 
 int main () {
 
-    Jogo jogo; 
+    Jogo jogo;  
 
     jogo.window.create(sf::VideoMode(WIDTH, HEIGHT), "Missionarios e Canibais");
 

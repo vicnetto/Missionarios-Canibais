@@ -17,19 +17,24 @@ int Jogo::mainMenu () {
     int currentX = 0; //Posição atual da textura, no eixo X;
 
     sf::Color brown (150, 75, 0); //Setando a cor para utilizala no men;
+    sf::Color greenKelly (68, 204, 0);
 
     Phrase miss ("Missionarios", 70, brown, sf::Vector2f(WIDTH * 4 / 17, HEIGHT / 9)); //Colocando a frase título;
-    Phrase e ("e", 70, sf::Color::Red, sf::Vector2f(WIDTH * 4 / 10, (HEIGHT / 9) + 45)); //Colocando um "e", que pertence ao menu;
+    Phrase e ("e", 70, sf::Color::Yellow, sf::Vector2f(WIDTH * 4 / 10, (HEIGHT / 9) + 45)); //Colocando um "e", que pertence ao menu;
     Phrase cani ("CANIBAIS", 70, sf::Color::Blue, sf::Vector2f(WIDTH * 4 / 10, (HEIGHT / 9) + 100)); //Colocando a ultima peça faltante, o canibais;
 
-    Phrase jogar ("Jogar", 40, sf::Color::Cyan, sf::Vector2f (WIDTH * 4 / 9, HEIGHT / 2)); //Colocando as três opções abaixo, que podem ser escolhidasd no menu;
-    Phrase sair ("Sair", 40, sf::Color::Cyan, sf::Vector2f (WIDTH * 4 / 8.7, HEIGHT * 2 / 2.5));
-    Phrase comojogar ("Como jogar", 40, sf::Color::Cyan, sf::Vector2f (WIDTH * 4 / 9.9, HEIGHT * 2 / 3.1));
+    Phrase jogar ("Jogar", 65, sf::Color::Yellow, sf::Vector2f (WIDTH * 4 / 9, HEIGHT / 2)); //Colocando as três opções abaixo, que podem ser escolhidasd no menu;
+    Phrase comojogar ("Como jogar", 65, sf::Color:: Yellow, sf::Vector2f (WIDTH * 4 / 9.9, HEIGHT * 2 / 3.065));
+    Phrase sair ("Sair", 65, sf::Color::Yellow, sf::Vector2f (WIDTH * 4 / 8.7, HEIGHT * 2 / 2.5));
+    Phrase victornetto ("POR: Victor Netto", 25, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.14, HEIGHT * 0.93));
 
     Sprites fundo (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Instanciando o fundo, com a primeira parte da textura;
+    Sprites biblia (sf::Vector2f(0.3, 0.3), sf::Vector2f(WIDTH / 6.2, HEIGHT / 9));
+    Sprites faca (sf::Vector2f(0.25, 0.25), sf::Vector2f(WIDTH * 3 / 5.3, (HEIGHT / 5.3)));
+    Sprites peteco (sf::Vector2f(0.2, 0.2), sf::Vector2f(WIDTH * 0.05, HEIGHT * 0.92));
 
     //Aqui é a verificação se existem os arquivos das fontes;
-    if (!miss.setFont("bin/FFF_Tusj.ttf") || !jogar.setFont("bin/good times rg.ttf") || !sair.setFont("bin/good times rg.ttf") || !comojogar.setFont("bin/good times rg.ttf") || !e.setFont("bin/Vegan.ttf") || !cani.setFont("bin/Nightmare.ttf"))
+    if (!miss.setFont("bin/FFF_Tusj.ttf") || !jogar.setFont("bin/afanan.ttf") || !sair.setFont("bin/afanan.ttf") || !comojogar.setFont("bin/afanan.ttf") || !e.setFont("bin/Vegan.ttf") || !cani.setFont("bin/Nightmare.ttf") || !victornetto.setFont("bin/Amilya.ttf"))
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
@@ -37,7 +42,7 @@ int Jogo::mainMenu () {
     }
 
     //Verifica se o arquivo da textura está disponível, caso contrário reporta o erro para o main, e para o console;
-    if (!fundo.setTexture("bin/Background.png")) //Carregando o fundo do menu;
+    if (!fundo.setTexture("bin/Background.png") || !biblia.setTexture("bin/biblia.png") || !faca.setTexture("bin/faca.png") || !peteco.setTexture("bin/LogoPETECO.png")) //Carregando o fundo do menu;
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
@@ -64,10 +69,14 @@ int Jogo::mainMenu () {
         window.clear(sf::Color::Black); //Limpa a tela e coloca uma cor inicial;
 
         window.draw(fundo.sprite);
+        window.draw(biblia.sprite);
+        window.draw(faca.sprite);
+        window.draw(peteco.sprite);
 
         window.draw(miss.text); //Escreve a palavra depois de ter limpado;
         window.draw(e.text);
         window.draw(cani.text);
+        window.draw(victornetto.text);
 
         window.draw(jogar.text);
         window.draw(sair.text);
