@@ -8,9 +8,9 @@ int main () {
 
     Jogo jogo;
 
-    jogo.window.create(sf::VideoMode(WIDTH, HEIGHT), "Missionarios e Canibais", sf::Style::Default);
+    jogo.window.create(sf::VideoMode(WIDTH, HEIGHT), "Missionarios e Canibais");
 
-    jogo.window.setFramerateLimit(60);
+    jogo.window.setFramerateLimit(100);
 
     jogo.mainMenu();
 

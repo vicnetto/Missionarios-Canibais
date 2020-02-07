@@ -3,6 +3,8 @@
 
 #define WIDTH 1920
 #define HEIGHT 1080
+#define XTEXT 1920 
+#define YTEXT 1080
 
 /*
 

@@ -24,3 +24,6 @@ auxiliares.o: auxiliares.cpp
 
 clean:
 	rm -rf *o executavel
+
+open:
+	code makefile main.cpp jogo.h jogo.cpp auxiliares.h auxiliares.cpp
