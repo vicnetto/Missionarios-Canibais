@@ -1,14 +1,14 @@
 # Placing some files that will be ignored by git. This files are just for my organization, in most of the cases.
 
 # Ignoring the executable linux file, just for organization.
-files/executavel*
+executavel*
 
 # This will ignore all the hpp files of SFML.
 sfml-hpp/
 
 # This are some objects files that will now be ignored.
-files/auxiliares.o
-files/jogo.o
-files/main.o
+src/auxiliares.o
+src/jogo.o
+src/main.o
 
 
