@@ -1,5 +1,10 @@
+#ifndef JOGO_H
+#define JOGO_H
+
 #include <iostream>
 #include <SFML/Graphics.hpp>
+
+#include "auxiliares.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -28,3 +33,5 @@ class Jogo {
     public:
         int mainMenu ();
 };
+
+#endif /* JOGO_H */

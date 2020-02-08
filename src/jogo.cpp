@@ -11,13 +11,19 @@
 #include "jogo.h"
 #include "auxiliares.h"
 
+/*
+
+int Jogo::mainMenu ()
+
+*/
 int Jogo::mainMenu () {
     sf::Clock clock; //Relógio auxiliador da movimentação da tela no menu inicial;
 
     int currentX = 0; //Posição atual da textura, no eixo X;
 
     sf::Color brown (150, 75, 0); //Setando a cor para utilizala no men;
-    sf::Color greenKelly (68, 204, 0);
+
+    sf::Mouse mouse; //Declarando o mouse, para pegar as suas posições no futuro;
 
     Phrase miss ("Missionarios", 70, brown, sf::Vector2f(WIDTH * 4 / 17, HEIGHT / 9)); //Colocando a frase título;
     Phrase e ("e", 70, sf::Color::Yellow, sf::Vector2f(WIDTH * 4 / 10, (HEIGHT / 9) + 45)); //Colocando um "e", que pertence ao menu;
@@ -49,7 +55,7 @@ int Jogo::mainMenu () {
         return 1;
     }
 
-    fundo.texture.setSmooth(true); //Colocando uma suavidade na textura;
+    //fundo.texture.setSmooth(true); //Colocando uma suavidade na textura;
 
     while (window.isOpen()) //Começando o loop principal do menu;
     {
@@ -59,12 +65,38 @@ int Jogo::mainMenu () {
             switch (event.type)
             {
             
+            case sf::Event::MouseMoved: //Tratando todas as possibilidades na hora de trocar as cores, caso tenha ou não tenha palavras.
+                if (jogar.isHovering(mouse.getPosition(window))) {
+                    jogar.text.setFillColor(sf::Color::Blue);
+                }
+                else
+                    jogar.text.setFillColor(sf::Color::Yellow);
+
+                if (comojogar.isHovering(mouse.getPosition(window)))
+                    comojogar.text.setFillColor(sf::Color::Blue);
+                else
+                    comojogar.text.setFillColor(sf::Color::Yellow);
+
+                if (sair.isHovering(mouse.getPosition(window)))
+                    sair.text.setFillColor(sf::Color::Blue);
+                else
+                    sair.text.setFillColor(sf::Color::Yellow);
+
+                break;
+
             case sf::Event::Closed: //Evento da janela fechada, no "X" da janela mesmo;
                 window.close();
 
                 break;
+
+            case sf::Event::MouseButtonPressed:
+                if (sair.isHovering(mouse.getPosition(window)))
+                    return 0;
+
+                break;
             }
         }
+        
 
         window.clear(sf::Color::Black); //Limpa a tela e coloca uma cor inicial;
 
