@@ -14,7 +14,7 @@
 class Jogo
 -> Classe principal do jogo, com TODAS as informações principais.
 
-ARGUMENTOS PÚBLICOS:
+VARIÁVEIS PÚBLICAS:
 - sf::RenderWindow window -> Instancia a janela, coloca todas as suas configurações para ser usado por todo o jogo.
 - sf::Event event -> Serve para o tratamento de eventos, ele foi colocado dentro da struct para poder ser utilizado com mais facilidade.
 

@@ -8,8 +8,12 @@
 #define XSTEXTURE 1920  //Qual o tamanho do eixo X de um frame completo na textura;
 #define YSTEXTURE 1080 //O tamanho no eixo Y de um frame inteiro;
 
-#define SCALEPRIEST 0.32
-#define SCALECANNIBAL 0.42
+#define SCALEPRIEST sf::Vector2f(0.32, 0.32)
+#define SCALECANNIBAL sf::Vector2f(0.42, 0.42)
+#define SCALEBOAT sf::Vector2f(0.5, 0.5)
+#define LEFTSIDE 0
+#define BOATSIDE 1
+#define RIGHTSIDE 2
 
 #include "jogo.h"
 #include "auxiliares.h"
@@ -154,25 +158,19 @@ int Jogo::start()
 */
 int Jogo::start() {
     Sprites background (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Iniciando o sprite que carregará o fundo;
-    Sprites priest[3]; //Colocando a sprite do padre;
-    Sprites cannibal[3]; //Colocando a sprite dos canibais;
 
-    priest[0].sprite.setScale(sf::Vector2f(SCALEPRIEST, SCALEPRIEST));
-    priest[0].sprite.setPosition(sf::Vector2f(1200, 180));
-    priest[1].sprite.setScale(sf::Vector2f(SCALEPRIEST, SCALEPRIEST));
-    priest[1].sprite.setPosition(sf::Vector2f(1430, 190));
-    priest[2].sprite.setScale(sf::Vector2f(SCALEPRIEST, SCALEPRIEST));
-    priest[2].sprite.setPosition(sf::Vector2f(1330, 450));
+    Character character[6]; //Inicializando as variáveis de todos os personagens do jogo.
+    Boat boat (3, 0, SCALEBOAT, sf::Vector2f(1000, 650));
 
-    cannibal[0].sprite.setScale(sf::Vector2f(SCALECANNIBAL, SCALECANNIBAL));
-    cannibal[0].sprite.setPosition(sf::Vector2f(1650, 200));
-    cannibal[1].sprite.setScale(sf::Vector2f(SCALECANNIBAL, SCALECANNIBAL));
-    cannibal[1].sprite.setPosition(sf::Vector2f(1590, 450));
-    cannibal[2].sprite.setScale(sf::Vector2f(SCALECANNIBAL, SCALECANNIBAL));
-    cannibal[2].sprite.setPosition(sf::Vector2f(1650, 700));
+    character[0].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1200, 180));
+    character[1].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1430, 190));
+    character[2].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1330, 450));
+    character[3].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 200));
+    character[4].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1590, 450));
+    character[5].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 700));
+    
 
-
-    if (!background.setTexture("bin/backgame.png") || !priest[0].setTexture("bin/padre1.png") || !priest[1].setTexture("bin/padre1.png") || !priest[2].setTexture("bin/padre1.png") || !cannibal[0].setTexture("bin/canibal1.png") || !cannibal[1].setTexture("bin/canibal1.png") || !cannibal[2].setTexture("bin/canibal1.png")) //Fazendo a verificação do fundo do jogo, vendo se é possível abri-lo sem problemas;
+    if (!background.setTexture("bin/backgame.png") || !character[0].setTexture("bin/padre1.png") || !character[1].setTexture("bin/padre1.png") || !character[2].setTexture("bin/padre1.png") || !character[3].setTexture("bin/canibal1.png") || !character[4].setTexture("bin/canibal1.png") || !character[5].setTexture("bin/canibal1.png") || !boat.setTexture("bin/barco.png")) //Fazendo a verificação do fundo do jogo, vendo se é possível abri-lo sem problemas;
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
@@ -185,9 +183,16 @@ int Jogo::start() {
         {
             switch (event.type)
             {
-            case sf::Event::KeyPressed: //Essa verificação é sobre o teclado, caso o jogador aperte o ESC, para voltar para o menu;
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) //ESCAPE == ESC
-                    return 1;
+                case sf::Event::Closed:
+                    window.close();
+
+                    return 0;
+
+                break;
+            
+                case sf::Event::KeyPressed: //Essa verificação é sobre o teclado, caso o jogador aperte o ESC, para voltar para o menu;
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) //ESCAPE == ESC
+                       return 0;
 
                 break;
             }
@@ -198,13 +203,14 @@ int Jogo::start() {
 
         window.draw(background.sprite); //Colocando o fundo do jogo;
 
-        window.draw(priest[0].sprite);
-        window.draw(priest[1].sprite);
-        window.draw(priest[2].sprite);
+        window.draw(boat.sprite);
 
-        window.draw(cannibal[0].sprite);
-        window.draw(cannibal[1].sprite);
-        window.draw(cannibal[2].sprite);
+        window.draw(character[0].sprite);
+        window.draw(character[1].sprite);
+        window.draw(character[2].sprite);
+        window.draw(character[3].sprite);
+        window.draw(character[4].sprite);
+        window.draw(character[5].sprite);
 
         window.display(); //Mostrando quais foram as alterações no fundo;
     }

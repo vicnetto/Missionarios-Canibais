@@ -66,7 +66,8 @@ bool Sprites::setTexture (std::string way)
 @return -> Sucesso da operação.
 
 */
-bool Sprites::setTexture (std::string way) {
+bool Sprites::setTexture (std::string way)
+{
 
     if (!texture.loadFromFile(way)) //Verificando se é possível acessar o arquivo;
     {
@@ -78,4 +79,39 @@ bool Sprites::setTexture (std::string way) {
     sprite.setTexture(texture);
 
     return true;
+}
+
+
+Character::Character()
+{
+    type = false;
+    location = 2;
+    sprite.setScale(1, 1);
+    sprite.setPosition(0 ,0);
+}
+
+/*
+
+void Character::setCharacter(bool t, int l, sf::Vector2f scale, sf::Vector2f position)
+@param bool t -> É o tipo do personagem, se é um missionário (1) ou um canibal (0).
+@param int l -> Serve para saber que lado o personagem está, no lado esquerdo (0), no meio (1) ou no lado direito (2).
+@param sf::Vector2f scale -> Tem objetivo de colocar a escala, ou seja, qual será o tamanho do sprite.
+@param sf::Vector2f position -> É a posição que está o personagem, em pixels.
+
+*/
+void Character::setCharacter(bool t, int l, sf::Vector2f scale, sf::Vector2f position)
+{
+    type = t;
+    location = l;
+
+    sprite.setScale(scale);
+    sprite.setPosition(position);
+}
+
+Boat::Boat(int location, int quantChar, sf::Vector2f scale, sf::Vector2f position)
+{
+    this->location = location;
+    this->quantChar = quantChar;
+    sprite.setScale(scale);
+    sprite.setPosition(position);
 }
