@@ -56,6 +56,7 @@ class Sprites
         sf::Texture texture;
 
     public:
+        Sprites();
         Sprites(sf::Vector2f size, sf::Vector2f position);
         bool setTexture (std::string way);
 };

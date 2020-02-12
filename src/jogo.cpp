@@ -8,6 +8,9 @@
 #define XSTEXTURE 1920  //Qual o tamanho do eixo X de um frame completo na textura;
 #define YSTEXTURE 1080 //O tamanho no eixo Y de um frame inteiro;
 
+#define SCALEPRIEST 0.32
+#define SCALECANNIBAL 0.42
+
 #include "jogo.h"
 #include "auxiliares.h"
 
@@ -35,9 +38,9 @@ int Jogo::mainMenu () {
     Phrase victornetto ("POR: Victor Netto", 25, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.14, HEIGHT * 0.93));
 
     Sprites fundo (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Instanciando o fundo, com a primeira parte da textura;
-    Sprites biblia (sf::Vector2f(0.3, 0.3), sf::Vector2f(WIDTH / 6.2, HEIGHT / 9));
-    Sprites faca (sf::Vector2f(0.25, 0.25), sf::Vector2f(WIDTH * 3 / 5.3, (HEIGHT / 5.3)));
-    Sprites peteco (sf::Vector2f(0.2, 0.2), sf::Vector2f(WIDTH * 0.05, HEIGHT * 0.92));
+    Sprites biblia (sf::Vector2f(0.3, 0.3), sf::Vector2f(WIDTH / 6.2, HEIGHT / 9)); //Colocando um pequeno detalhe de biblia ao lado do nome dos missionários.
+    Sprites faca (sf::Vector2f(0.25, 0.25), sf::Vector2f(WIDTH * 3 / 5.3, (HEIGHT / 5.3))); //Sprite de faca ao lado do nome dos canibais.
+    Sprites peteco (sf::Vector2f(0.2, 0.2), sf::Vector2f(WIDTH * 0.05, HEIGHT * 0.92)); //Logo do PETECO, o grande influenciador do projeto.
 
     //Aqui é a verificação se existem os arquivos das fontes;
     if (!miss.setFont("bin/FFF_Tusj.ttf") || !jogar.setFont("bin/afanan.ttf") || !sair.setFont("bin/afanan.ttf") || !comojogar.setFont("bin/afanan.ttf") || !e.setFont("bin/Vegan.ttf") || !cani.setFont("bin/Nightmare.ttf") || !victornetto.setFont("bin/Amilya.ttf"))
@@ -89,18 +92,27 @@ int Jogo::mainMenu () {
 
                 break;
 
-            case sf::Event::MouseButtonPressed:
-                if (sair.isHovering(mouse.getPosition(window)))
+            case sf::Event::MouseButtonPressed: //Caso alguma tecla do mouse seja ativada;
+                if (jogar.isHovering(mouse.getPosition(window))) {
+                    start(); //Chama a função principal do jogo;
+
+                    if (jogar.isHovering(mouse.getPosition(window))) { //Essa verificação é infelizmente necessária para não apresentar um bug na hora de voltar;
+                        jogar.text.setFillColor(sf::Color::Blue);
+                    }
+                    else
+                        jogar.text.setFillColor(sf::Color::Yellow);
+                }
+
+                if (sair.isHovering(mouse.getPosition(window))) //Essa opção é chamada na saida, caso o botão seja apertado em cima da área de sair;
                     return 0;
 
                 break;
             }
         }
-        
 
         window.clear(sf::Color::Black); //Limpa a tela e coloca uma cor inicial;
 
-        window.draw(fundo.sprite);
+        window.draw(fundo.sprite); //Nessa linha e abaixo, printando os sprites;
         window.draw(biblia.sprite);
         window.draw(faca.sprite);
         window.draw(peteco.sprite);
@@ -110,7 +122,7 @@ int Jogo::mainMenu () {
         window.draw(cani.text);
         window.draw(victornetto.text);
 
-        window.draw(jogar.text);
+        window.draw(jogar.text); //Nessa linha e abaixo, colocando as opções do menu;
         window.draw(sair.text);
         window.draw(comojogar.text);
 
@@ -131,6 +143,74 @@ int Jogo::mainMenu () {
             fundo.sprite.setTextureRect(sf::IntRect(currentX, ENDY, XSTEXTURE, YSTEXTURE)); //Coloca a textura em seu devido lugar, atualiza todo o tempo;
         }
     }
+
+    return 0; //TODO: Futuramente, caso seja necessário essa função deve retornar algum valor;
+}
+
+/*
+
+int Jogo::start()
+
+*/
+int Jogo::start() {
+    Sprites background (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Iniciando o sprite que carregará o fundo;
+    Sprites priest[3]; //Colocando a sprite do padre;
+    Sprites cannibal[3]; //Colocando a sprite dos canibais;
+
+    priest[0].sprite.setScale(sf::Vector2f(SCALEPRIEST, SCALEPRIEST));
+    priest[0].sprite.setPosition(sf::Vector2f(1200, 180));
+    priest[1].sprite.setScale(sf::Vector2f(SCALEPRIEST, SCALEPRIEST));
+    priest[1].sprite.setPosition(sf::Vector2f(1430, 190));
+    priest[2].sprite.setScale(sf::Vector2f(SCALEPRIEST, SCALEPRIEST));
+    priest[2].sprite.setPosition(sf::Vector2f(1330, 450));
+
+    cannibal[0].sprite.setScale(sf::Vector2f(SCALECANNIBAL, SCALECANNIBAL));
+    cannibal[0].sprite.setPosition(sf::Vector2f(1650, 200));
+    cannibal[1].sprite.setScale(sf::Vector2f(SCALECANNIBAL, SCALECANNIBAL));
+    cannibal[1].sprite.setPosition(sf::Vector2f(1590, 450));
+    cannibal[2].sprite.setScale(sf::Vector2f(SCALECANNIBAL, SCALECANNIBAL));
+    cannibal[2].sprite.setPosition(sf::Vector2f(1650, 700));
+
+
+    if (!background.setTexture("bin/backgame.png") || !priest[0].setTexture("bin/padre1.png") || !priest[1].setTexture("bin/padre1.png") || !priest[2].setTexture("bin/padre1.png") || !cannibal[0].setTexture("bin/canibal1.png") || !cannibal[1].setTexture("bin/canibal1.png") || !cannibal[2].setTexture("bin/canibal1.png")) //Fazendo a verificação do fundo do jogo, vendo se é possível abri-lo sem problemas;
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
+
+        return 1;
+    }
+
+    while (window.isOpen()) //Enquanto a janela está aberta;
+    {
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            case sf::Event::KeyPressed: //Essa verificação é sobre o teclado, caso o jogador aperte o ESC, para voltar para o menu;
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) //ESCAPE == ESC
+                    return 1;
+
+                break;
+            }
+        }
+
+
+        window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;
+
+        window.draw(background.sprite); //Colocando o fundo do jogo;
+
+        window.draw(priest[0].sprite);
+        window.draw(priest[1].sprite);
+        window.draw(priest[2].sprite);
+
+        window.draw(cannibal[0].sprite);
+        window.draw(cannibal[1].sprite);
+        window.draw(cannibal[2].sprite);
+
+        window.display(); //Mostrando quais foram as alterações no fundo;
+    }
+
+
+
 
     return 0;
 }

@@ -46,6 +46,13 @@ bool Phrase::isHovering(sf::Vector2i mousePos) {
     return false;
 }
 
+
+Sprites::Sprites()
+{
+    sprite.setScale(1, 1);
+    sprite.setPosition(0 ,0);
+}
+
 Sprites::Sprites(sf::Vector2f size, sf::Vector2f position)
 {
     sprite.setScale(size);

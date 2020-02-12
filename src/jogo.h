@@ -22,6 +22,7 @@ ARGUMENTOS PÚBLICOS:
 FUNÇÕES PÚBLICAS:
 - int mainMenu () -> O motivo principal é o mesmo do nome, serve para fazer o menu de uma forma mais organizada, tendo todos os parâmentros
 dentro da classe Jogo.
+- int jogar () -> Essa função é a principal do jogo, pelo menos onde é chamado e organizado todas as verificações do jogo.
 
 */
 
@@ -32,6 +33,7 @@ class Jogo {
 
     public:
         int mainMenu ();
+        int start ();
 };
 
 #endif /* JOGO_H */
