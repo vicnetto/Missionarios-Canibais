@@ -47,6 +47,7 @@ VARIÁVEIS PÚBLICAS:
 FUNÇÕES PÚBLICAS:
 - Sprites -> Esse é o construtor, onde é o objetivo principal da criação dessa struct, para deixar as coisas mais organizadas.
 - bool setTexture () -> O objetivo dessa é colocar a textura no sprite, e principalmente verificar se está com algum problema no arquivo.
+- bool isHovering () -> Essa função é exatamente a mesma da classe Phrases, mas com uma diferença mínima que se trata de sprites.
 
 */
 class Sprites
@@ -59,6 +60,7 @@ class Sprites
         Sprites();
         Sprites(sf::Vector2f size, sf::Vector2f position);
         bool setTexture (std::string way);
+        bool isHovering (sf::Vector2i mousePos);
 };
 
 /*
@@ -95,21 +97,28 @@ class Boat : public Sprites
 
 
 VARIÁVEIS PÚBLICAS:
-- int location -> Essa variável armazena em qual local está o barco, se é no lado esquerdo (1), em movimento (2) ou do lado direito (3);
+- int location -> Essa variável armazena em qual local está o barco, se é no lado esquerdo (true), se é no lado direito (false).
 - int quantChar -> Nessa, é para representar quantos personagens estão no barco, para colocar um limite de dois.
 
 FUNÇÕES PÚBLICAS:
 - Boat () -> Esse construtor serve para iniciar todas as variáveis e poupar código no jogo.cpp.
+- void moveBoat () -> A função moveBoat () tem o objetivo único de mover o barco para o outro lado.
 
 */
 class Boat : public Sprites
 {
     public:
-        int location; //1 é para lado esquedo, 2 é para em movimento, 3 é para lado direito;
+        bool location; //True = lado esquerdo, false = lado direito;
+        bool moving; //True quando está se movendo, e false quando está parado.
         int quantChar; //Quantidade de pessoas dentro do barco;
+
+        int xinitial;
+        int xfinal;
+        int speed;
     
     public:
-        Boat(int location, int quantChar, sf::Vector2f scale, sf::Vector2f position);
+        Boat(bool location, int quantChar, sf::Vector2f scale, sf::Vector2f position);
+        void moveBoat ();
 
 };
 

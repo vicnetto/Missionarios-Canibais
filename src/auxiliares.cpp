@@ -1,7 +1,13 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 
 #include "auxiliares.h"
+
+#define BOATXRIGHT 1032
+#define BOATXLEFT 500
+#define BOATVELOCITY 4
+#define BOATY 900
 
 Phrase::Phrase(std::string phrase, int size, sf::Color color, sf::Vector2f position) {
     text.setString(phrase);
@@ -81,6 +87,14 @@ bool Sprites::setTexture (std::string way)
     return true;
 }
 
+bool Sprites::isHovering (sf::Vector2i mousePos)
+{
+    if (sprite.getGlobalBounds().contains(mousePos.x, mousePos.y))
+        return true;
+
+    return false;
+}
+
 
 Character::Character()
 {
@@ -108,10 +122,44 @@ void Character::setCharacter(bool t, int l, sf::Vector2f scale, sf::Vector2f pos
     sprite.setPosition(position);
 }
 
-Boat::Boat(int location, int quantChar, sf::Vector2f scale, sf::Vector2f position)
+Boat::Boat(bool location, int quantChar, sf::Vector2f scale, sf::Vector2f position)
 {
     this->location = location;
     this->quantChar = quantChar;
     sprite.setScale(scale);
     sprite.setPosition(position);
+
+    xfinal = 0;
+    xinitial = 0;
+    speed = 0;
+}
+
+/*
+
+void Boat::moveBoat ()
+
+*/
+void Boat::moveBoat ()
+{
+    if (location == false) {
+        xinitial = BOATXRIGHT; //Setando as configurações para o movimento do barco;
+        xfinal = BOATXLEFT;
+
+        speed = -BOATVELOCITY; //Velocidade que o barco andará.
+        location = true; //Informando que o lado foi trocado;
+        moving = true;
+
+        sprite.setPosition(xinitial, BOATY); //Para fazer o espelhamento do barco, é necessário essas duas ultimas linhas no código;
+        sprite.setScale(0.5, 0.5); //Essa espelha o barco, e a de cima corrige a sua posição;
+    } else {
+        xinitial = BOATXLEFT; //Colocando outras configurações caso ele esteja do lado direito;
+        xfinal = BOATXRIGHT + sprite.getGlobalBounds().width;
+
+        speed = BOATVELOCITY;  
+        location = false;  //Informando que o lado foi trocado;
+        moving = true;
+                            
+        sprite.setPosition(xinitial + sprite.getGlobalBounds().width, BOATY); //Do mesmo jeito que na ida para o lado esquerdo, precisa dessas duas linhas;
+        sprite.setScale(-0.5, 0.5); //A primeira corrige a posição do x, e a segunda espelha o barco para ir em sentido da volta;
+    }   
 }

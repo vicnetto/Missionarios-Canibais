@@ -12,8 +12,10 @@
 #define SCALECANNIBAL sf::Vector2f(0.42, 0.42)
 #define SCALEBOAT sf::Vector2f(0.5, 0.5)
 #define LEFTSIDE 0
-#define BOATSIDE 1
+#define MOVING 1
 #define RIGHTSIDE 2
+#define BOATXRIGHT 1032
+#define BOATY 900
 
 #include "jogo.h"
 #include "auxiliares.h"
@@ -157,10 +159,14 @@ int Jogo::start()
 
 */
 int Jogo::start() {
+    int xinitial, xfinal, side;
+
+    sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
+
     Sprites background (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Iniciando o sprite que carregará o fundo;
 
     Character character[6]; //Inicializando as variáveis de todos os personagens do jogo.
-    Boat boat (3, 0, SCALEBOAT, sf::Vector2f(1000, 650));
+    Boat boat (false, 0, SCALEBOAT, sf::Vector2f(BOATXRIGHT, BOATY));
 
     character[0].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1200, 180));
     character[1].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1430, 190));
@@ -179,7 +185,7 @@ int Jogo::start() {
 
     while (window.isOpen()) //Enquanto a janela está aberta;
     {
-        while (window.pollEvent(event))
+        while (window.pollEvent(event) && boat.moving != true)
         {
             switch (event.type)
             {
@@ -195,9 +201,20 @@ int Jogo::start() {
                        return 0;
 
                 break;
+
+                case sf::Event::MouseButtonPressed: //Vendo se o jogador apertou em alguma coisa;
+                    if (boat.isHovering(mouse.getPosition(window))) {
+                        boat.moveBoat(); //Chama a função de mover o barco, caso ele clique no barco;
+                    }
+                break;
             }
         }
 
+        if (boat.moving == true && boat.sprite.getPosition().x != boat.xfinal) //Fazendo a verificação se o barco está andando, e move ele dentro do if;
+            boat.sprite.move(boat.speed, 0);
+        else
+            boat.moving = false; //Caso o barco parou de andar, coloca que ele não está em movimento, para poupar processamento;      
+        
 
         window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;
 
