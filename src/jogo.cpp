@@ -8,14 +8,16 @@
 #define XSTEXTURE 1920  //Qual o tamanho do eixo X de um frame completo na textura;
 #define YSTEXTURE 1080 //O tamanho no eixo Y de um frame inteiro;
 
-#define SCALEPRIEST sf::Vector2f(0.32, 0.32)
-#define SCALECANNIBAL sf::Vector2f(0.42, 0.42)
-#define SCALEBOAT sf::Vector2f(0.5, 0.5)
-#define LEFTSIDE 0
-#define MOVING 1
-#define RIGHTSIDE 2
-#define BOATXRIGHT 1032
-#define BOATY 900
+
+#define SCALEPRIEST sf::Vector2f(0.32, 0.32) //Tamanho da sprite do padre;
+#define SCALECANNIBAL sf::Vector2f(0.42, 0.42) //Tamanho da sprite do canibal;
+#define SCALEBOAT sf::Vector2f(0.5, 0.5) //Tamanho da sprite do barco; 
+#define LEFTSIDE 0 //O lado esquerdo vale como 0;
+#define MOVING 1 //Quando está se movendo no barco, vale 1;
+#define RIGHTSIDE 2 //Quando está no lado direito, vale 2;
+#define BOATXRIGHT 1032 //A posição X inicial do barco é essa, no lado direito;
+#define BOATY 900 //Essa é a posição fixa do Y, não varia em nenhum momento;
+#define NCHARACT 6
 
 #include "jogo.h"
 #include "auxiliares.h"
@@ -169,14 +171,22 @@ int Jogo::start() {
     Boat boat (false, 0, SCALEBOAT, sf::Vector2f(BOATXRIGHT, BOATY));
 
     character[0].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1200, 180));
-    character[1].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1430, 190));
+    character[1].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1430, 170));
     character[2].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1330, 450));
-    character[3].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 200));
+    character[3].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 160));
     character[4].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1590, 450));
-    character[5].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 700));
+    character[5].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 750));
     
-
+    //Verificando se os arquvios estão disponíveis, e se estão abrindo sem problemas;
     if (!background.setTexture("bin/backgame.png") || !character[0].setTexture("bin/padre1.png") || !character[1].setTexture("bin/padre1.png") || !character[2].setTexture("bin/padre1.png") || !character[3].setTexture("bin/canibal1.png") || !character[4].setTexture("bin/canibal1.png") || !character[5].setTexture("bin/canibal1.png") || !boat.setTexture("bin/barco.png")) //Fazendo a verificação do fundo do jogo, vendo se é possível abri-lo sem problemas;
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
+
+        return 1;
+    }
+    
+    //Aqui estamos carregando as texturas que deixam o jogador brilhando, na hora de passar o mouse por cima dele.
+    if (!character[0].setBrightTexture("bin/padre2.png") || !character[1].setBrightTexture("bin/padre2.png") || !character[2].setBrightTexture("bin/padre2.png") || !character[3].setBrightTexture("bin/canibal2.png") || !character[4].setBrightTexture("bin/canibal2.png") || !character[5].setBrightTexture("bin/canibal2.png"))
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
@@ -189,7 +199,17 @@ int Jogo::start() {
         {
             switch (event.type)
             {
-                case sf::Event::Closed:
+                case sf::Event::MouseMoved: 
+                    for (int i = 0; i < NCHARACT; i++) { //Esse laço verifica se o mouse está em cima de algum jogador, e logo em seguida muda as variáveis para trabalhar mais abaixo.
+                        if (character[i].isHovering(mouse.getPosition(window)))
+                            character[i].bright = true;
+                        else
+                            character[i].bright = false;
+                    }
+
+                break;
+
+                case sf::Event::Closed: //Caso fechar a janela;
                     window.close();
 
                     return 0;
@@ -222,12 +242,12 @@ int Jogo::start() {
 
         window.draw(boat.sprite);
 
-        window.draw(character[0].sprite);
-        window.draw(character[1].sprite);
-        window.draw(character[2].sprite);
-        window.draw(character[3].sprite);
-        window.draw(character[4].sprite);
-        window.draw(character[5].sprite);
+        for (int i = 0; i < NCHARACT; i++) { //Esse laço, bem importante, verifica se o mouse está em cima do personagem, e caso esteja desenha o personagem brilhante.
+            if (character[i].bright == false) 
+                window.draw(character[i].sprite);
+            else
+                window.draw(character[i].brightsprite);
+        }
 
         window.display(); //Mostrando quais foram as alterações no fundo;
     }

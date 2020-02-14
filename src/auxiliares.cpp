@@ -113,13 +113,36 @@ void Character::setCharacter(bool t, int l, sf::Vector2f scale, sf::Vector2f pos
 @param sf::Vector2f position -> É a posição que está o personagem, em pixels.
 
 */
-void Character::setCharacter(bool t, int l, sf::Vector2f scale, sf::Vector2f position)
+void Character::setCharacter(bool type, int location, sf::Vector2f scale, sf::Vector2f position)
 {
-    type = t;
-    location = l;
+    this->type = type;
+    this->location = location;
 
     sprite.setScale(scale);
     sprite.setPosition(position);
+
+    brightsprite.setScale(scale);
+    brightsprite.setPosition(position);
+}
+
+/*
+
+bool Character::setBrightTexture(std::string way)
+@param std::string way -> É o caminho percorrido para chegar até a sprite com cor.
+
+*/
+bool Character::setBrightTexture(std::string way)
+{
+    if (!brighttexture.loadFromFile(way)) //Verificando se é possível acessar o arquivo;
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
+
+        return false; //Problema em encontrar o arquivo;
+    }
+
+    brightsprite.setTexture(brighttexture);
+
+    return true;
 }
 
 Boat::Boat(bool location, int quantChar, sf::Vector2f scale, sf::Vector2f position)
