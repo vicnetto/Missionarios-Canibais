@@ -22,6 +22,8 @@
 #include "jogo.h"
 #include "auxiliares.h"
 
+//--------------------------------------------------------- JOGO --------------------------------------------------------------------------
+
 /*
 
 int Jogo::mainMenu ()
@@ -186,7 +188,7 @@ int Jogo::start() {
     }
     
     //Aqui estamos carregando as texturas que deixam o jogador brilhando, na hora de passar o mouse por cima dele.
-    if (!character[0].setBrightTexture("bin/padre2.png") || !character[1].setBrightTexture("bin/padre2.png") || !character[2].setBrightTexture("bin/padre2.png") || !character[3].setBrightTexture("bin/canibal2.png") || !character[4].setBrightTexture("bin/canibal2.png") || !character[5].setBrightTexture("bin/canibal2.png"))
+    if (!character[0].setBrightTexture("bin/padre2.png") || !character[1].setBrightTexture("bin/padre2.png") || !character[2].setBrightTexture("bin/padre2.png") || !character[3].setBrightTexture("bin/canibal2.png") || !character[4].setBrightTexture("bin/canibal2.png") || !character[5].setBrightTexture("bin/canibal2.png") || !boat.setBrightTexture("bin/barco2.png"))
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
@@ -200,12 +202,17 @@ int Jogo::start() {
             switch (event.type)
             {
                 case sf::Event::MouseMoved: 
-                    for (int i = 0; i < NCHARACT; i++) { //Esse laço verifica se o mouse está em cima de algum jogador, e logo em seguida muda as variáveis para trabalhar mais abaixo.
+                    for (int i = 0; i < NCHARACT; i++) { //Esse laço verifica se o mouse está em cima de algum jogador, e logo em seguida muda as variáveis para trabalhar mais abaixo;
                         if (character[i].isHovering(mouse.getPosition(window)))
                             character[i].bright = true;
                         else
                             character[i].bright = false;
                     }
+
+                    if (boat.isHovering(mouse.getPosition(window))) //Aqui verifica se o mouse está em cima do barco ou não, e caso esteja coloca o brilho como true, ou false, caso seja o caso;
+                        boat.bright = true;
+                    else
+                        boat.bright = false;
 
                 break;
 
@@ -230,17 +237,24 @@ int Jogo::start() {
             }
         }
 
-        if (boat.moving == true && boat.sprite.getPosition().x != boat.xfinal) //Fazendo a verificação se o barco está andando, e move ele dentro do if;
+        if (boat.moving == true && boat.sprite.getPosition().x != boat.xfinal) { //Fazendo a verificação se o barco está andando, e move ele dentro do if;
+            boat.bright = false; //Colocando essa variável como falso, para deixar o barco na cor normal quando ele estiver se movendo;
+
             boat.sprite.move(boat.speed, 0);
-        else
-            boat.moving = false; //Caso o barco parou de andar, coloca que ele não está em movimento, para poupar processamento;      
+            boat.brightsprite.move(boat.speed, 0);
+
+        } else
+            boat.moving = false; //Caso o barco parou de andar, coloca que ele não está em movimento, para poupar processamento;     
         
 
         window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;
 
         window.draw(background.sprite); //Colocando o fundo do jogo;
 
-        window.draw(boat.sprite);
+        if (boat.bright == false) //Colocando a opção em cima do barco, para o jogador saber que é possível mover o barco;
+            window.draw(boat.sprite);
+        else
+            window.draw(boat.brightsprite);
 
         for (int i = 0; i < NCHARACT; i++) { //Esse laço, bem importante, verifica se o mouse está em cima do personagem, e caso esteja desenha o personagem brilhante.
             if (character[i].bright == false) 
@@ -257,3 +271,5 @@ int Jogo::start() {
 
     return 0;
 }
+
+//-----------------------------------------------------------------------------------------------------------------------------------
