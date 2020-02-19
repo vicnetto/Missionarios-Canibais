@@ -1,5 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <bits/stdc++.h>
+
+#include "jogo.h"
+#include "auxiliares.h"
 
 #define SLOWNESS 10000 //Lentidão da tela, a velocidade em que ela muda cada frame;
 #define DISTANCE 1.7 //A distância que cada frame percorre (não são dados reais);
@@ -8,19 +12,16 @@
 #define XSTEXTURE 1920  //Qual o tamanho do eixo X de um frame completo na textura;
 #define YSTEXTURE 1080 //O tamanho no eixo Y de um frame inteiro;
 
-
 #define SCALEPRIEST sf::Vector2f(0.32, 0.32) //Tamanho da sprite do padre;
-#define SCALECANNIBAL sf::Vector2f(0.42, 0.42) //Tamanho da sprite do canibal;
+#define SCALECANNIBAL sf::Vector2f(0.385, 0.385) //Tamanho da sprite do canibal;
 #define SCALEBOAT sf::Vector2f(0.5, 0.5) //Tamanho da sprite do barco; 
 #define LEFTSIDE 0 //O lado esquerdo vale como 0;
-#define MOVING 1 //Quando está se movendo no barco, vale 1;
-#define RIGHTSIDE 2 //Quando está no lado direito, vale 2;
+#define BOATLEFTSIDE 1 //O barco no lado esqurdo vale 1;
+#define BOATRIGHTSIDE 2 //O barco no lado direito vale 2;
+#define RIGHTSIDE 3 //Quando está no lado direito, vale 3;
 #define BOATXRIGHT 1032 //A posição X inicial do barco é essa, no lado direito;
 #define BOATY 900 //Essa é a posição fixa do Y, não varia em nenhum momento;
 #define NCHARACT 6
-
-#include "jogo.h"
-#include "auxiliares.h"
 
 //--------------------------------------------------------- JOGO --------------------------------------------------------------------------
 
@@ -167,6 +168,12 @@ int Jogo::start() {
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
 
+    std::stack<sf::Vector2f> leftSpaces;
+    std::stack<sf::Vector2f> rightSpaces;
+    std::stack<sf::Vector2f> boatSpaces;
+    boatSpaces.push(sf::Vector2f(1240, 680));
+    boatSpaces.push(sf::Vector2f(1065, 680));
+
     Sprites background (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Iniciando o sprite que carregará o fundo;
 
     Character character[6]; //Inicializando as variáveis de todos os personagens do jogo.
@@ -174,9 +181,9 @@ int Jogo::start() {
 
     character[0].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1200, 180));
     character[1].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1430, 170));
-    character[2].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1330, 450));
+    character[2].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1420, 450));
     character[3].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 160));
-    character[4].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1590, 450));
+    character[4].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1640, 450));
     character[5].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 750));
     
     //Verificando se os arquvios estão disponíveis, e se estão abrindo sem problemas;
@@ -232,6 +239,12 @@ int Jogo::start() {
                 case sf::Event::MouseButtonPressed: //Vendo se o jogador apertou em alguma coisa;
                     if (boat.isHovering(mouse.getPosition(window))) {
                         boat.moveBoat(); //Chama a função de mover o barco, caso ele clique no barco;
+                    }
+
+                    for (int i = 0; i < NCHARACT; i++) {
+                        if (character[i].isHovering(mouse.getPosition(window))) {
+                            character[i].moveTo(leftSpaces, boatSpaces, rightSpaces, boat);
+                        }
                     }
                 break;
             }

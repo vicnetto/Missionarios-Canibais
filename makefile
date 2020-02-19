@@ -2,7 +2,7 @@
 
 CC=g++
 
-CFLAGS=-c
+CFLAGS=-c -e
 
 SFMLINCLUDES=-Lsfml-hpp/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
