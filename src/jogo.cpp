@@ -3,8 +3,10 @@
 #include <bits/stdc++.h>
 
 #include "jogo.h"
-#include "auxiliares.h"
 #include "phrase.h"
+#include "sprites.h"
+#include "boat.h"
+#include "character.h"
 
 #define SLOWNESS 10000 //Lentidão da tela, a velocidade em que ela muda cada frame;
 #define DISTANCE 1.7 //A distância que cada frame percorre (não são dados reais);
@@ -165,7 +167,7 @@ int Jogo::start()
 
 */
 int Jogo::start() {
-    int xinitial, xfinal, side, cont = 0;
+    int xinitial, xfinal, side;
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
 

@@ -14,6 +14,7 @@ Phrase::Phrase(std::string phrase, int size, sf::Color color, sf::Vector2f posit
 @param int scale -> Aqui configura-se o tamanho da escala para a frase.
 @param sf::Color color -> Colocando cor na letra, onde pode ser escolhida pela sf::Color.
 @param sf::Vector2f position -> Qual a posiçao inicial da frase, no eixo X/Y.
+@return
 
 */
 Phrase::Phrase(std::string phrase, int scale, sf::Color color, sf::Vector2f position) {
@@ -53,10 +54,10 @@ bool Phrase::isHovering(sf::Vector2i mousePos, Phrase phrase)
 */
 bool Phrase::isHovering(sf::Vector2i mousePos) {
 
-    if (text.getGlobalBounds().contains(mousePos.x, mousePos.y))
+    if (text.getGlobalBounds().contains(mousePos.x, mousePos.y)) //Pega a posição que está o texto e compara com a atual do mouse, caso esteja em cima, retorna true;
         return true;
 
-    return false;
+    return false; //Ou false caso esteja fora;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------

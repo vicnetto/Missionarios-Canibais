@@ -7,10 +7,14 @@ executavel*
 sfml-hpp/
 
 # This are some objects files that will now be ignored.
-src/auxiliares.o
 src/jogo.o
 src/main.o
 src/phrase.o
+src/sprites.o
+src/boat.o
+src/character.o
+src/points.o
+
 
 
 

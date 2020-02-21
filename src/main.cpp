@@ -2,7 +2,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "jogo.h"
-#include "auxiliares.h"
 
 int main () {
 
