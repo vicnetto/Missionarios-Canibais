@@ -10,5 +10,7 @@ sfml-hpp/
 src/auxiliares.o
 src/jogo.o
 src/main.o
+src/phrase.o
+
 
 

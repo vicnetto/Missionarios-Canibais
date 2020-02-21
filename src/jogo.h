@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "auxiliares.h"
+#include "phrase.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080

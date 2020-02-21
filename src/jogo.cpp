@@ -4,6 +4,7 @@
 
 #include "jogo.h"
 #include "auxiliares.h"
+#include "phrase.h"
 
 #define SLOWNESS 10000 //Lentidão da tela, a velocidade em que ela muda cada frame;
 #define DISTANCE 1.7 //A distância que cada frame percorre (não são dados reais);
@@ -21,7 +22,7 @@
 #define RIGHTSIDE 3 //Quando está no lado direito, vale 3;
 #define BOATXRIGHT 1032 //A posição X inicial do barco é essa, no lado direito;
 #define BOATY 900 //Essa é a posição fixa do Y, não varia em nenhum momento;
-#define NCHARACT 6
+#define NCHARACT 6 //Era 6;
 
 //--------------------------------------------------------- JOGO --------------------------------------------------------------------------
 
@@ -164,11 +165,18 @@ int Jogo::start()
 
 */
 int Jogo::start() {
-    int xinitial, xfinal, side;
+    int xinitial, xfinal, side, cont = 0;
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
 
     std::stack<sf::Vector2f> leftSpaces;
+    leftSpaces.push(sf::Vector2f(100, 150));
+    leftSpaces.push(sf::Vector2f(300, 140));
+    leftSpaces.push(sf::Vector2f(500, 130));
+    leftSpaces.push(sf::Vector2f(120, 450));
+    leftSpaces.push(sf::Vector2f(360, 450));
+    leftSpaces.push(sf::Vector2f(110, 740));
+
     std::stack<sf::Vector2f> rightSpaces;
     std::stack<sf::Vector2f> boatSpaces;
     boatSpaces.push(sf::Vector2f(1240, 680));
@@ -241,9 +249,9 @@ int Jogo::start() {
                         boat.moveBoat(); //Chama a função de mover o barco, caso ele clique no barco;
                     }
 
-                    for (int i = 0; i < NCHARACT; i++) {
+                    for (int i = 0; i < NCHARACT; i++) { //Loop para percorrer todos os personagens;
                         if (character[i].isHovering(mouse.getPosition(window))) {
-                            character[i].moveTo(leftSpaces, boatSpaces, rightSpaces, boat);
+                            character[i].moveTo(leftSpaces, boatSpaces, rightSpaces, boat); //Caso o jogador aperte em cima do personagem, essa função move o personagem para o local correto;
                         }
                     }
                 break;
@@ -253,11 +261,31 @@ int Jogo::start() {
         if (boat.moving == true && boat.sprite.getPosition().x != boat.xfinal) { //Fazendo a verificação se o barco está andando, e move ele dentro do if;
             boat.bright = false; //Colocando essa variável como falso, para deixar o barco na cor normal quando ele estiver se movendo;
 
-            boat.sprite.move(boat.speed, 0);
-            boat.brightsprite.move(boat.speed, 0);
+            boat.sprite.move(boat.speed, 0); //Move a sprite do barco mas em uma velocidade bem pequena;
+            boat.brightsprite.move(boat.speed, 0); //Move a sprite de opção do barco na mesma velocidade;
 
-        } else
-            boat.moving = false; //Caso o barco parou de andar, coloca que ele não está em movimento, para poupar processamento;     
+            for (int i = 0; i < NCHARACT; i++){ //Esse laço serve para mover caso existam personagens em cima do barco;
+                if (character[i].location == BOATRIGHTSIDE || character[i].location == BOATLEFTSIDE) { //Se ele estiver no barco, em qualquer lado, ele deve ir junto;
+                    character[i].sprite.move(boat.speed, 0);
+                }
+            }
+        } else if (boat.moving) { //TRATAMENTO PÓS MOVIMENTAÇÃO, LOGO APOS O BARCO PARAR;
+            for (int i = 0; i < NCHARACT; i++){ //Para finalizar o movimento do barco, quando ele estiver se movendo mas já chegou no seu objetivo final, devemos mudar a posição dos perso;
+                if (character[i].location == BOATRIGHTSIDE) {  //Aqui verifica, caso ele veio do barco na direita, colocamos ele no barco do lado esquerdo;
+                    character[i].location = BOATLEFTSIDE;
+
+                    character[i].brightsprite.setPosition(character[i].sprite.getPosition()); //Arruma a sprite de opção, que não precisa ficar acompanhando todo o tempo;
+                }
+                else if (character[i].location == BOATLEFTSIDE) { //E caso contrário, colocamos ele no lado direito, porque o barco acabou de andar;
+                    character[i].location = BOATRIGHTSIDE;
+
+                    character[i].brightsprite.setPosition(character[i].sprite.getPosition()); //Arruma a sprite de opção, que não precisa ficar acompanhando todo o tempo;
+                }
+            }
+            
+            boat.moveBoatFreePos(boatSpaces); //Movendo as posições do barco, para colocar elas no local certo agora que o barco se moveu;
+            boat.moving = false; //Para finalizar, coloca-se o barco como parado, para não mover mais ele;
+        }
         
 
         window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;

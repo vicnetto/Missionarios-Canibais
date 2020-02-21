@@ -15,59 +15,7 @@
 #define BOATRIGHTSIDE 2 //O barco no lado direito vale 2;
 #define RIGHTSIDE 3 //Quando está no lado direito, vale 3;
 
-//---------------------------------------------------------- PHRASE -------------------------------------------------------------------------
-
-/*
-
-Phrase::Phrase(std::string phrase, int size, sf::Color color, sf::Vector2f position)
-@param std::string phrase -> Sendo uma string, mostra o real conteúdo do que estará escrito na frase.
-@param int scale -> Aqui configura-se o tamanho da escala para a frase.
-@param sf::Color color -> Colocando cor na letra, onde pode ser escolhida pela sf::Color.
-@param sf::Vector2f position -> Qual a posiçao inicial da frase, no eixo X/Y.
-
-*/
-Phrase::Phrase(std::string phrase, int scale, sf::Color color, sf::Vector2f position) {
-    text.setString(phrase);
-    text.setCharacterSize(scale);
-    text.setFillColor(color);
-    text.setPosition(position);
-}
-
-/*
-
--> bool Phrase::setFont(std::string way)
-@param way -> Caminho até o arquivo.
-@return -> Sucesso da operação.
-
-*/
-bool Phrase::setFont(std::string way) {
-
-    if (!font.loadFromFile(way)) //Verificando se é possível acessar o arquivo;
-    {
-        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
-
-        return false; //Problema em encontrar o arquivo.
-    }
-
-    text.setFont(font);
-
-    return true;
-}
-
-/*
-
-bool Phrase::isHovering(sf::Vector2i mousePos, Phrase phrase)
-@param mousePos -> Posição do mouse na janela.
-@return -> Caso esteja em cima é "true", caso contrário "false".
-
-*/
-bool Phrase::isHovering(sf::Vector2i mousePos) {
-
-    if (text.getGlobalBounds().contains(mousePos.x, mousePos.y))
-        return true;
-
-    return false;
-}
+#define XAXISBOATDISTANCE 532
 
 //-------------------------------------------------------- SPRITES ---------------------------------------------------------------------------
 
@@ -207,10 +155,10 @@ void Character::moveTo (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vec
     bool isPossible = false; //Fazendo uma condição, caso ele passe dessa condição quer dizer que é um movimento válido.
 
     if (location == LEFTSIDE || location == RIGHTSIDE) {
-        if (location == RIGHTSIDE && boat.location == false && boat.quantChar != 2) //Primeira situação, caso o jogador esteja na terra e o barco esteja no seu lado, no lado direito;
+        if (location == RIGHTSIDE && boat.isOnTheLeft == false && boat.quantChar != 2) //Primeira situação, caso o jogador esteja na terra e o barco esteja no seu lado, no lado direito;
             isPossible = true;
 
-        if (location == LEFTSIDE && boat.location == true && boat.quantChar != 2) //Segunda situação, os dois no mesmo lado, porém esse no lado esquerdo;
+        if (location == LEFTSIDE && boat.isOnTheLeft == true && boat.quantChar != 2) //Segunda situação, os dois no mesmo lado, porém esse no lado esquerdo;
             isPossible = true;
 
         if (isPossible) { //Aqui só entra se passou pelo menos em uma das verificações;
@@ -258,16 +206,16 @@ void Character::moveTo (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vec
 
 /*
 
-Boat::Boat(bool location, int quantChar, sf::Vector2f scale, sf::Vector2f position)
-@param bool location -> Onde está localizado o barco, se é no lado true (esquerdo) ou no lado false (direito).
+Boat::Boat(bool isOnTheLeft, int quantChar, sf::Vector2f scale, sf::Vector2f position)
+@param bool isOnTheLeft -> Onde está localizado o barco, se é no lado true (esquerdo) ou no lado false (direito).
 @param int quantChar -> Quantos persongens estão em cima do barco atualmente.
 @param sf::Vector2f scale -> Qual a escala do barco.
 @param sf::Vector2f position -> Onde é a posição inicial do barco.
 
 */
-Boat::Boat(bool location, int quantChar, sf::Vector2f scale, sf::Vector2f position)
+Boat::Boat(bool isOnTheLeft, int quantChar, sf::Vector2f scale, sf::Vector2f position)
 {
-    this->location = location;
+    this->isOnTheLeft = isOnTheLeft;
     this->quantChar = quantChar;
     moving = false;
 
@@ -291,12 +239,12 @@ void Boat::moveBoat ()
 */
 void Boat::moveBoat ()
 {
-    if (location == false) {
+    if (isOnTheLeft == false) {
         xinitial = BOATXRIGHT; //Setando as configurações para o movimento do barco;
         xfinal = BOATXLEFT;
 
         speed = -BOATVELOCITY; //Velocidade que o barco andará.
-        location = true; //Informando que o lado foi trocado;
+        isOnTheLeft = true; //Informando que o lado foi trocado;
         moving = true;
 
         sprite.setPosition(xinitial, BOATY); //Para fazer o espelhamento do barco, é necessário essas duas ultimas linhas no código;
@@ -309,7 +257,7 @@ void Boat::moveBoat ()
         xfinal = BOATXRIGHT + sprite.getGlobalBounds().width;
 
         speed = BOATVELOCITY;  
-        location = false;  //Informando que o lado foi trocado;
+        isOnTheLeft = false;  //Informando que o lado foi trocado;
         moving = true;
                             
         sprite.setPosition(xinitial + sprite.getGlobalBounds().width, BOATY); //Do mesmo jeito que na ida para o lado esquerdo, precisa dessas duas linhas;
@@ -318,6 +266,39 @@ void Boat::moveBoat ()
         brightsprite.setPosition(xinitial + sprite.getGlobalBounds().width, BOATY);
         brightsprite.setScale(-0.5, 0.5);
     }   
+}
+
+/*
+
+void Boat::moveBoatFreePos (std::stack<sf::Vector2f> &boatSpaces)
+@param std::stack<sf::Vector2f> &boatSpaces -> Aqui ficam as posições livres do barco;
+@return
+
+*/
+void Boat::moveBoatFreePos (std::stack<sf::Vector2f> &boatSpaces)
+{
+    int distance = -XAXISBOATDISTANCE; //Deixando pronto caso ele esteja na direita;
+
+    std::stack<sf::Vector2f> correctedStack; //Essa é a stack que estará corrigida;
+    sf::Vector2<float> vectorForChange; //Esse é o vetor corretor, onde vamos colocar o valor corrigido antes de colocar na stack corrigida;
+
+    if (isOnTheLeft) //Aqui ta corrigindo para diferenciar as distâncias, pois para a direita ele move positivamente;
+        distance = -distance;
+
+    while (!boatSpaces.empty()) { //Enquanto o barco não está vazio;
+        vectorForChange = boatSpaces.top(); //Coloca no vetor de mudança, para colocar a distância nova na posição, que é feito na linha abaixo;
+        vectorForChange.x -= distance;
+
+        correctedStack.push(vectorForChange); //Aqui coloca tudo na stack corrigida;
+
+        boatSpaces.pop(); //E tira esse posição do barco, pois agora ela está atualizada;
+    }
+
+    while (!correctedStack.empty()) { //Esse loop serve basicamente para tirar os elementos da corrigida e levar para a boatSpaces, onde estará atualizada;
+        boatSpaces.push(correctedStack.top()); 
+
+        correctedStack.pop();
+    }
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------

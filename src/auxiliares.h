@@ -8,35 +8,6 @@
 
 /*
 
-class Pharase
--> Classe feita para palavras, com todas as suas organizações.
-
-
-VARIÁVEIS PÚBLICAS:
-- sf::Text text -> Tem basicamente tudo sobre o texto, pode ser alterado com tudo.
-- sf::Font font -> Serve para mudar a fonte do texto.
-
-FUNÇÕES PÚBLICAS:
-- Phrase -> É o construtor da classe Phrase, seta inicialmente tudo o que será necessário, para logo em seguida colocar a fonte.
-- bool setFont -> Tem como parâmetro o caminho até o arquivo, onde tenta aplicar essa fonte para o texto.
-- int isHovering () -> Essa função é para ver se o mouse está em cima de alguma coisa, para fazer o click no local certo.
-
-*/
-class Phrase 
-{
-    public:
-        sf::Text text;
-        sf::Font font;
-        bool hovering;
-
-    public:
-        Phrase(std::string phrase, int scale, sf::Color color, sf::Vector2f position);
-        bool setFont (std::string way);
-        bool isHovering (sf::Vector2i mousePos);
-};
-
-/*
-
 class Sprites
 -> Classe feita para facilitar o processo de criação dos sprites, resumindo basicamente ele em um construtor e futuramente adicionando algumas novas variáveis.
 
@@ -80,7 +51,7 @@ class Boat : public Sprites
 
 
 VARIÁVEIS PÚBLICAS:
-- int location -> Essa variável armazena em qual local está o barco, se é no lado esquerdo (true), se é no lado direito (false).
+- int isOnTheLeft -> Essa variável armazena em qual local está o barco, se é no lado esquerdo (true), se é no lado direito (false).
 - int moving -> Essa variável tem a função de saber onde está o barco, se está se movendo ou não. Ou seja, true para movimentando, e false para não movimentando.
 - int quantChar -> Nessa, é para representar quantos personagens estão no barco, para colocar um limite de dois.
 
@@ -91,12 +62,13 @@ VARIÁVEIS PÚBLICAS:
 FUNÇÕES PÚBLICAS:
 - Boat () -> Esse construtor serve para iniciar todas as variáveis e poupar código no jogo.cpp.
 - void moveBoat () -> A função moveBoat () tem o objetivo único de mover o barco para o outro lado.
+- void moveBoatFreePos () -> Essa função move as posições do barco, faz com que no final de cada movimento do barco elas sejam atualizadas com a nova posição;
 
 */
 class Boat : public Sprites
 {
     public:
-        bool location; //True = lado esquerdo, false = lado direito;
+        bool isOnTheLeft; //True = lado esquerdo, false = lado direito;
         bool moving; //True quando está se movendo, e false quando está parado.
         int quantChar; //Quantidade de pessoas dentro do barco;
 
@@ -105,9 +77,9 @@ class Boat : public Sprites
         int speed; //Essa é a velocidade do barco, que não é bem alterada, é colocada como define no auxiliares.cpp
     
     public:
-        Boat(bool location, int quantChar, sf::Vector2f scale, sf::Vector2f position);
+        Boat(bool isOnTheLeft, int quantChar, sf::Vector2f scale, sf::Vector2f position);
         void moveBoat ();
-
+        void moveBoatFreePos (std::stack<sf::Vector2f> &boatSpaces);
 };
 
 /*
