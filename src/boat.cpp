@@ -10,8 +10,13 @@
 #define BOATXLEFT 500
 #define BOATVELOCITY 4
 #define BOATY 900
+#define BOATLEFT 1 //O barco no lado esqurdo vale 1;
+#define BOATRIGHT 2 //O barco no lado direito vale 2;
+#define NUMBCHARS 6 //Era 6;
 
 #define XAXISBOATDISTANCE 532
+
+class Character;
 
 
 //-------------------------------------------------------- BOAT ---------------------------------------------------------------------------

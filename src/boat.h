@@ -2,6 +2,9 @@
 #define BOAT_H
 
 #include "sprites.h"
+#include "gamedata.h"
+
+class Character;
 
 /*
 

@@ -7,6 +7,10 @@
 #include "sprites.h"
 #include "boat.h"
 #include "character.h"
+#include "gamedata.h"
+
+#define WIDTH 1920
+#define HEIGHT 1080
 
 #define SLOWNESS 10000 //Lentidão da tela, a velocidade em que ela muda cada frame;
 #define DISTANCE 1.7 //A distância que cada frame percorre (não são dados reais);
@@ -24,7 +28,7 @@
 #define RIGHTSIDE 3 //Quando está no lado direito, vale 3;
 #define BOATXRIGHT 1032 //A posição X inicial do barco é essa, no lado direito;
 #define BOATY 900 //Essa é a posição fixa do Y, não varia em nenhum momento;
-#define NCHARACT 6 //Era 6;
+#define NUMBEROFCHARS 6 //Era 6;
 
 //--------------------------------------------------------- JOGO --------------------------------------------------------------------------
 
@@ -168,8 +172,11 @@ int Jogo::start()
 */
 int Jogo::start() {
     int xinitial, xfinal, side;
+    bool isCharAllFalse; //Essa variável é para saber se o mouse não está em cima de nenhum personagem, para auxiliar no barco;
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
+
+    GameData gameData;
 
     std::stack<sf::Vector2f> leftSpaces;
     leftSpaces.push(sf::Vector2f(100, 150));
@@ -186,7 +193,7 @@ int Jogo::start() {
 
     Sprites background (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Iniciando o sprite que carregará o fundo;
 
-    Character character[6]; //Inicializando as variáveis de todos os personagens do jogo.
+    Character character[NUMBEROFCHARS]; //Inicializando as variáveis de todos os personagens do jogo.
     Boat boat (false, 0, SCALEBOAT, sf::Vector2f(BOATXRIGHT, BOATY));
 
     character[0].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1200, 180));
@@ -219,14 +226,19 @@ int Jogo::start() {
             switch (event.type)
             {
                 case sf::Event::MouseMoved: 
-                    for (int i = 0; i < NCHARACT; i++) { //Esse laço verifica se o mouse está em cima de algum jogador, e logo em seguida muda as variáveis para trabalhar mais abaixo;
-                        if (character[i].isHovering(mouse.getPosition(window)))
+                    isCharAllFalse = true;
+
+                    for (int i = 0; i < NUMBEROFCHARS; i++) { //Esse laço verifica se o mouse está em cima de algum jogador, e logo em seguida muda as variáveis para trabalhar mais abaixo;
+                        if (character[i].isHovering(mouse.getPosition(window))) {
                             character[i].bright = true;
-                        else
+
+                            isCharAllFalse = false;
+                        } else {
                             character[i].bright = false;
+                        }
                     }
 
-                    if (boat.isHovering(mouse.getPosition(window))) //Aqui verifica se o mouse está em cima do barco ou não, e caso esteja coloca o brilho como true, ou false, caso seja o caso;
+                    if (boat.isHovering(mouse.getPosition(window)) && isCharAllFalse == true) //Aqui verifica se o mouse está em cima do barco ou não, e caso esteja coloca o brilho como true, ou false, caso seja o caso;
                         boat.bright = true;
                     else
                         boat.bright = false;
@@ -247,13 +259,17 @@ int Jogo::start() {
                 break;
 
                 case sf::Event::MouseButtonPressed: //Vendo se o jogador apertou em alguma coisa;
-                    if (boat.isHovering(mouse.getPosition(window))) {
+                    if (boat.isHovering(mouse.getPosition(window)) && isCharAllFalse == true) {
+                        gameData.moves += 1;
+
                         boat.moveBoat(); //Chama a função de mover o barco, caso ele clique no barco;
                     }
 
-                    for (int i = 0; i < NCHARACT; i++) { //Loop para percorrer todos os personagens;
+                    for (int i = 0; i < NUMBEROFCHARS; i++) { //Loop para percorrer todos os personagens;
                         if (character[i].isHovering(mouse.getPosition(window))) {
                             character[i].moveTo(leftSpaces, boatSpaces, rightSpaces, boat); //Caso o jogador aperte em cima do personagem, essa função move o personagem para o local correto;
+
+                            character[i].bright = false; //Colocando a luz em volta nele de falso novamente;
                         }
                     }
                 break;
@@ -266,29 +282,43 @@ int Jogo::start() {
             boat.sprite.move(boat.speed, 0); //Move a sprite do barco mas em uma velocidade bem pequena;
             boat.brightsprite.move(boat.speed, 0); //Move a sprite de opção do barco na mesma velocidade;
 
-            for (int i = 0; i < NCHARACT; i++){ //Esse laço serve para mover caso existam personagens em cima do barco;
+            for (int i = 0; i < NUMBEROFCHARS; i++){ //Esse laço serve para mover caso existam personagens em cima do barco;
                 if (character[i].location == BOATRIGHTSIDE || character[i].location == BOATLEFTSIDE) { //Se ele estiver no barco, em qualquer lado, ele deve ir junto;
                     character[i].sprite.move(boat.speed, 0);
                 }
             }
         } else if (boat.moving) { //TRATAMENTO PÓS MOVIMENTAÇÃO, LOGO APOS O BARCO PARAR;
-            for (int i = 0; i < NCHARACT; i++){ //Para finalizar o movimento do barco, quando ele estiver se movendo mas já chegou no seu objetivo final, devemos mudar a posição dos perso;
+            for (int i = 0; i < NUMBEROFCHARS; i++){ //Para finalizar o movimento do barco, quando ele estiver se movendo mas já chegou no seu objetivo final, devemos mudar a posição dos perso;
                 if (character[i].location == BOATRIGHTSIDE) {  //Aqui verifica, caso ele veio do barco na direita, colocamos ele no barco do lado esquerdo;
                     character[i].location = BOATLEFTSIDE;
+
+                    if (character[i].isPriest) //ATUALIZANDO OS DADOS DO GAMEDATA;
+                        gameData.rightSidePriests -= 1; //Colocando menos um padre do lado direito, nesse caso ele acabou de ir para o lado esquerdo;
+                    else
+                        gameData.rightSideCanibals -= 1; //Diminunindo um canibal do lado direito, pois ele acabou de atravessar pelo barco;
 
                     character[i].brightsprite.setPosition(character[i].sprite.getPosition()); //Arruma a sprite de opção, que não precisa ficar acompanhando todo o tempo;
                 }
                 else if (character[i].location == BOATLEFTSIDE) { //E caso contrário, colocamos ele no lado direito, porque o barco acabou de andar;
                     character[i].location = BOATRIGHTSIDE;
 
+                    if (character[i].isPriest)
+                        gameData.rightSidePriests += 1; //Somando mais um padre caso ele venha do lado esquerdo, para o GameData;
+                    else
+                        gameData.rightSideCanibals += 1; //Colocando mais um canibal caso ele atravesse pelo barco para o lado direito;
+
                     character[i].brightsprite.setPosition(character[i].sprite.getPosition()); //Arruma a sprite de opção, que não precisa ficar acompanhando todo o tempo;
                 }
             }
+
+            //PRINTANDO ALGUNS DADOS NO CONSOLE
+            std::cout << "# Alguns dados: " << gameData.moves << " movimentos." << std::endl;
+            std::cout << "No lado direito: " << gameData.rightSideCanibals << " canibais | " << gameData.rightSidePriests << " priests" << std::endl;
+            std::cout << "No lado esquerdo: " << 3 - gameData.rightSideCanibals << " canibais | " << 3 - gameData.rightSidePriests << " priests" << std::endl << std::endl;
             
             boat.moveBoatFreePos(boatSpaces); //Movendo as posições do barco, para colocar elas no local certo agora que o barco se moveu;
             boat.moving = false; //Para finalizar, coloca-se o barco como parado, para não mover mais ele;
         }
-        
 
         window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;
 
@@ -299,7 +329,7 @@ int Jogo::start() {
         else
             window.draw(boat.brightsprite);
 
-        for (int i = 0; i < NCHARACT; i++) { //Esse laço, bem importante, verifica se o mouse está em cima do personagem, e caso esteja desenha o personagem brilhante.
+        for (int i = 0; i < NUMBEROFCHARS; i++) { //Esse laço, bem importante, verifica se o mouse está em cima do personagem, e caso esteja desenha o personagem brilhante.
             if (character[i].bright == false) 
                 window.draw(character[i].sprite);
             else

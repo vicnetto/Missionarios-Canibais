@@ -1,16 +1,18 @@
+#include "boat.h"
+#include "character.h"
+#include "sprites.h"
+
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <bits/stdc++.h>
 
-#include "character.h"
-#include "sprites.h"
-#include "boat.h"
-
 #define LEFTSIDE 0 //O lado esquerdo vale como 0;
 #define BOATLEFTSIDE 1 //O barco no lado esqurdo vale 1;
 #define BOATRIGHTSIDE 2 //O barco no lado direito vale 2;
 #define RIGHTSIDE 3 //Quando está no lado direito, vale 3;
+
+class Boat;
 
 //------------------------------------------------------ CHARACTER ----------------------------------------------------------------------------
 
@@ -23,7 +25,7 @@ Character::Character()
 */
 Character::Character()
 {
-    type = false;
+    isPriest = false;
     location = 2;
     sprite.setScale(1, 1);
     sprite.setPosition(0 ,0);
@@ -32,16 +34,16 @@ Character::Character()
 /*
 
 void Character::setCharacter(bool t, int l, sf::Vector2f scale, sf::Vector2f position)
-@param bool type -> É o tipo do personagem, se é um missionário (1) ou um canibal (0).
+@param bool isPriest -> É o tipo do personagem, se é um missionário (1) ou um canibal (0).
 @param int location -> Serve para saber que lado o personagem está, no lado esquerdo (0), no meio (1) ou no lado direito (2).
 @param sf::Vector2f scale -> Tem objetivo de colocar a escala, ou seja, qual será o tamanho do sprite.
 @param sf::Vector2f position -> É a posição que está o personagem, em pixels.
 @return
 
 */
-void Character::setCharacter(bool type, int location, sf::Vector2f scale, sf::Vector2f position)
+void Character::setCharacter(bool isPriest, int location, sf::Vector2f scale, sf::Vector2f position)
 {
-    this->type = type;
+    this->isPriest = isPriest;
     this->location = location;
 
     sprite.setScale(scale);

@@ -6,7 +6,7 @@ CFLAGS=-c -e
 
 SFMLINCLUDES=-Lsfml-hpp/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
-ARCHIVESdotO=src/main.o src/jogo.o src/phrase.o src/sprites.o src/boat.o src/character.o src/points.o
+ARCHIVESdotO=src/main.o src/jogo.o src/phrase.o src/sprites.o src/boat.o src/character.o src/gamedata.o
 
 # Now executing the makefile.
 
@@ -24,20 +24,20 @@ jogo.o: src/jogo.cpp
 phrase.o: src/phrase.cpp
 	$(CC) $(CFLAGS) src/phrase.cpp $(SFMLINCLUDES)
 
-sprites.o: src/sprites.o
+sprites.o: src/sprites.cpp
 	$(CC) $(CFLAGS) src/sprites.cpp $(SFMLINCLUDES)
 
-boat.o: src/boat.o
+boat.o: src/boat.cpp
 	$(CC) $(CFLAGS) src/boat.cpp $(SFMLINCLUDES)
 
-character.o: src/character.o
+character.o: src/character.cpp
 	$(CC) $(CFLAGS) src/character.cpp $(SFMLINCLUDES)
 
-points.o: src/points.o
-	$(CC) $(CFLAGS) src/points.cpp $(SFMLINCLUDES)
+gamedata.o: src/gamedata.cpp
+	$(CC) $(CFLAGS) src/gamedata.cpp $(SFMLINCLUDES)
 
 clean:
 	rm -rf *o executavel
 
 open:
-	code makefile src/main.cpp src/jogo.h src/jogo.cpp src/phrase.h src/phrase.cpp src/sprites.h src/sprites.cpp src/boat.h src/boat.cpp src/character.h src/character.cpp src/points.cpp
+	code makefile src/main.cpp src/jogo.h src/jogo.cpp src/phrase.h src/phrase.cpp src/sprites.h src/sprites.cpp src/boat.h src/boat.cpp src/character.h src/character.cpp src/gamedata.h src/gamedata.cpp
