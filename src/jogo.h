@@ -4,6 +4,9 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+#define WIDTH 1920
+#define HEIGHT 1080
+
 /*
 
 class Jogo

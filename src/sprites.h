@@ -20,7 +20,7 @@ VARIÁVEIS PÚBLICAS:
 - bool bright -> Já esta variável serve para indicar se o mouse está em cima ou não, ou seja, true para sim, e false para não.
 
 FUNÇÕES PÚBLICAS:
-- Sprites () -> Esse é o construtor, onde é o objetivo principal da criação dessa struct, para deixar as coisas mais organizadas.
+- Sprites () -> Esse é o construtor, onde é o objetivo principal da criação dessa classe, para deixar as coisas mais organizadas.
 - bool setBrightTexture (std::string way) -> Essa função tem como objetivo setar e retornar se houve sucesso ao mudar a textura da BrightSprite, ela funciona do mesmo modo da
 função da classe Sprites, porém com variáveis diferentes.
 - bool setTexture () -> O objetivo dessa é colocar a textura no sprite, e principalmente verificar se está com algum problema no arquivo.

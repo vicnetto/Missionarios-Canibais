@@ -9,9 +9,6 @@
 #include "character.h"
 #include "gamedata.h"
 
-#define WIDTH 1920
-#define HEIGHT 1080
-
 #define SLOWNESS 10000 //Lentidão da tela, a velocidade em que ela muda cada frame;
 #define DISTANCE 1.7 //A distância que cada frame percorre (não são dados reais);
 #define ENDX 3840 //Em qual lugar é finalizado a textura;
@@ -40,6 +37,12 @@
 /*
 
 int Jogo::mainMenu ()
+
+    O motivo principal é o mesmo do nome, serve para fazer o menu de uma forma mais organizada, tendo todos os parâmentros
+dentro da classe Jogo.
+
+@param
+@return int
 
 */
 int Jogo::mainMenu () {
@@ -174,27 +177,38 @@ int Jogo::mainMenu () {
 
 int Jogo::start()
 
+    Essa função é a principal do jogo, pelo menos onde é chamado e organizado todas as verificações do jogo.
+
+@param
+@return int
+
 */
 int Jogo::start() {
+    sf::Color darkBlue (0,72,186); //Colocando uma cor mais harmoniosa no jogo;
+
     int xinitial, xfinal, side;
     bool isCharAllFalse; //Essa variável é para saber se o mouse não está em cima de nenhum personagem, para auxiliar no barco;
+    int winOrLose; //Verificação utilizada para ver se o jogador perdeu, para evitar algumas chamadas extras na função;
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
 
-    GameData gameData;
+    Phrase tempo ("Tempo (seg): ", 50, darkBlue, sf::Vector2f(WIDTH * 0.7, HEIGHT * 0.01));
+    Phrase time ("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.83, HEIGHT * 0.01)); //Instânciando um objeto de tempo, onde será atualizado sempre que mudar os segundos;
+
+    Phrase movimentos("Movimentos: ", 50, darkBlue, sf::Vector2f(WIDTH * 0.45, HEIGHT * 0.01));
+    Phrase movements ("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.58, HEIGHT * 0.01)); //Esses dois movimentos são a quantidade de movimentos que o jogador realizou;
+
+    Phrase tentativas("Tentativas: ", 50, darkBlue, sf::Vector2f(WIDTH * 0.20, HEIGHT * 0.01));
+    Phrase attempts("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.33, HEIGHT * 0.01)); //Aqui são as tentativas, cada vez que o jogador perde soma-se 1 na quantidade;
+
+
+    GameData gameData; //Alocando espaço para a classe onde os dados serão armazenados no jogo;
 
     std::stack<sf::Vector2f> leftSpaces;
-    leftSpaces.push(sf::Vector2f(100, 150));
-    leftSpaces.push(sf::Vector2f(300, 140));
-    leftSpaces.push(sf::Vector2f(500, 130));
-    leftSpaces.push(sf::Vector2f(120, 450));
-    leftSpaces.push(sf::Vector2f(360, 450));
-    leftSpaces.push(sf::Vector2f(110, 740));
-
     std::stack<sf::Vector2f> rightSpaces;
     std::stack<sf::Vector2f> boatSpaces;
-    boatSpaces.push(sf::Vector2f(1240, 680));
-    boatSpaces.push(sf::Vector2f(1065, 680));
+
+    gameData.initializeStacks(leftSpaces, boatSpaces);
 
     Sprites background (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Iniciando o sprite que carregará o fundo;
 
@@ -207,6 +221,14 @@ int Jogo::start() {
     character[3].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 160));
     character[4].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1640, 450));
     character[5].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 750));
+
+    //Inicializando as texturas dos textos que agora foram inseridos no jogo, para mostrar o desempenho do jogador;
+    if (!time.setFont("bin/afanan.ttf") || !tempo.setFont("bin/afanan.ttf") || !movimentos.setFont("bin/afanan.ttf") || !movements.setFont("bin/afanan.ttf") || !tentativas.setFont("bin/afanan.ttf") || !attempts.setFont("bin/afanan.ttf")) 
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
+
+        return 1;
+    }
     
     //Verificando se os arquvios estão disponíveis, e se estão abrindo sem problemas;
     if (!background.setTexture("bin/backgame.png") || !character[0].setTexture("bin/padre1.png") || !character[1].setTexture("bin/padre1.png") || !character[2].setTexture("bin/padre1.png") || !character[3].setTexture("bin/canibal1.png") || !character[4].setTexture("bin/canibal1.png") || !character[5].setTexture("bin/canibal1.png") || !boat.setTexture("bin/barco.png")) //Fazendo a verificação do fundo do jogo, vendo se é possível abri-lo sem problemas;
@@ -327,13 +349,24 @@ int Jogo::start() {
             boat.moving = false; //Para finalizar, coloca-se o barco como parado, para não mover mais ele;
         }
 
-        if (gameData.endGame() == WIN || gameData.endGame() == LOSE) {
+        winOrLose = gameData.verifyWinConditions(character); //Verificando se o jogador venceu o ganhou, chamando a função verifyWinConditions();
+
+        if (winOrLose == WIN || winOrLose == LOSE) { //Agora sim comparando o resultado para ver vitória ou derrota;
             return 0;
         }
+
+        gameData.printStatistics(time, movements);
 
         window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;
 
         window.draw(background.sprite); //Colocando o fundo do jogo;
+        
+        window.draw(tempo.text);
+        window.draw(time.text);
+        window.draw(movimentos.text);
+        window.draw(movements.text);
+        window.draw(tentativas.text);
+        window.draw(attempts.text);
 
         if (boat.bright == false) //Colocando a opção em cima do barco, para o jogador saber que é possível mover o barco;
             window.draw(boat.sprite);

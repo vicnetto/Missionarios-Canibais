@@ -11,6 +11,9 @@
 /*
 
 Sprites::Sprites()
+
+    Esse é o construtor, onde é o objetivo principal da criação dessa classe, para deixar as coisas mais organizadas.
+
 @param
 @return
 
@@ -24,6 +27,9 @@ Sprites::Sprites()
 /*
 
 Sprites::Sprites(sf::Vector2f size, sf::Vector2f position)
+
+    Esse é o construtor, onde é o objetivo principal da criação dessa classe, para deixar as coisas mais organizadas.
+
 @param sf::Vector2f scale -> Tamanho da escala, que será aplicada a sprite.
 @param sf::Vector2f position -> Posição inicial da sprite.
 
@@ -37,6 +43,10 @@ Sprites::Sprites(sf::Vector2f scale, sf::Vector2f position)
 /*
 
 bool Character::setBrightTexture(std::string way)
+
+    Essa função tem como objetivo setar e retornar se houve sucesso ao mudar a textura da BrightSprite, ela funciona do mesmo modo da
+função da classe Sprites, porém com variáveis diferentes.
+
 @param std::string way -> É o caminho percorrido para chegar até a sprite com cor.
 @return bool -> Retorna se foi possível fazer a aplicação da textura ou não.
 
@@ -58,6 +68,9 @@ bool Sprites::setBrightTexture(std::string way)
 /*
 
 bool Sprites::setTexture (std::string way)
+
+    O objetivo dessa é colocar a textura no sprite, e principalmente verificar se está com algum problema no arquivo.
+
 @param srd::string way -> Caminho até o arquivo.
 @return bool -> Sucesso da operação.
 
@@ -80,6 +93,9 @@ bool Sprites::setTexture (std::string way)
 /*
 
 bool Sprites::isHovering (sf::Vector2i mousePos)
+
+    Essa função é exatamente a mesma da classe Phrases, mas com uma diferença mínima que se trata de sprites.
+
 @param sf::Vector2i mousePos -> Isso é a posição atual do mouse.
 @return bool -> True para contém, e false para não contido.
 

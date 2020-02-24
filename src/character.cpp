@@ -19,6 +19,9 @@ class Boat;
 /*
 
 Character::Character()
+
+    É o grande construtor, ele inicializa todas as variáveis, até o de sua classe mãe.
+
 @param
 @return
 
@@ -34,6 +37,10 @@ Character::Character()
 /*
 
 void Character::setCharacter(bool t, int l, sf::Vector2f scale, sf::Vector2f position)
+
+    Essa função, importantíssima, serve como um constutor, porém como é instanciado um vetor no main, é necessário uma função para tratar com cada objeto,
+onde se encontra essa função.
+
 @param bool isPriest -> É o tipo do personagem, se é um missionário (1) ou um canibal (0).
 @param int location -> Serve para saber que lado o personagem está, no lado esquerdo (0), no meio (1) ou no lado direito (2).
 @param sf::Vector2f scale -> Tem objetivo de colocar a escala, ou seja, qual será o tamanho do sprite.
@@ -56,6 +63,9 @@ void Character::setCharacter(bool isPriest, int location, sf::Vector2f scale, sf
 /*
 
 void moveTo (std::stack boatSpaces)
+
+    Essa função serve para organizar os comandos de mover o personagem, para dentro do barco ou para fora.
+
 @param std::stack<sf::Vector2f> &leftSpaces -> Como parâmetro, tem os espaços livres no lado esquerdo do rio.
 @param std::stack<sf::Vector2f> &boatSpaces -> Nesse, não muito diferente, são os espaços livres dentro do barco.
 @param std::stack<sf::Vector2f> &rightSpaces -> Também, nesse estão os lugares livres no lado direito do rio.

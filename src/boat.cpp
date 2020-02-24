@@ -24,6 +24,9 @@ class Character;
 /*
 
 Boat::Boat(bool isOnTheLeft, int quantChar, sf::Vector2f scale, sf::Vector2f position)
+
+    Esse construtor serve para iniciar todas as variáveis e poupar código no jogo.cpp.
+
 @param bool isOnTheLeft -> Onde está localizado o barco, se é no lado true (esquerdo) ou no lado false (direito).
 @param int quantChar -> Quantos persongens estão em cima do barco atualmente.
 @param sf::Vector2f scale -> Qual a escala do barco.
@@ -51,6 +54,9 @@ Boat::Boat(bool isOnTheLeft, int quantChar, sf::Vector2f scale, sf::Vector2f pos
 /*
 
 void Boat::moveBoat ()
+
+    A função moveBoat () tem o objetivo único de mover o barco para o outro lado.
+
 @param
 @return
 
@@ -89,6 +95,9 @@ void Boat::moveBoat ()
 /*
 
 void Boat::moveBoatFreePos (std::stack<sf::Vector2f> &boatSpaces)
+
+    Essa função move as posições do barco, faz com que no final de cada movimento do barco elas sejam atualizadas com a nova posição;
+
 @param std::stack<sf::Vector2f> &boatSpaces -> Aqui ficam as posições livres do barco;
 @return
 
