@@ -30,6 +30,11 @@
 #define BOATY 900 //Essa é a posição fixa do Y, não varia em nenhum momento;
 #define NUMBEROFCHARS 6 //Era 6;
 
+#define CONTINUE 0
+#define LOSE 1
+#define WIN 2
+
+
 //--------------------------------------------------------- JOGO --------------------------------------------------------------------------
 
 /*
@@ -260,9 +265,11 @@ int Jogo::start() {
 
                 case sf::Event::MouseButtonPressed: //Vendo se o jogador apertou em alguma coisa;
                     if (boat.isHovering(mouse.getPosition(window)) && isCharAllFalse == true) {
-                        gameData.moves += 1;
+                        if (boat.quantChar != 0){ //Caso o barco tenha apenas mais de 0 jogadores, pois vazio ele não pode andar;
+                            gameData.moves += 1; //Soma um no movimento do barco;
 
-                        boat.moveBoat(); //Chama a função de mover o barco, caso ele clique no barco;
+                            boat.moveBoat(); //Chama a função de mover o barco, caso ele clique no barco;
+                        }
                     }
 
                     for (int i = 0; i < NUMBEROFCHARS; i++) { //Loop para percorrer todos os personagens;
@@ -318,6 +325,10 @@ int Jogo::start() {
             
             boat.moveBoatFreePos(boatSpaces); //Movendo as posições do barco, para colocar elas no local certo agora que o barco se moveu;
             boat.moving = false; //Para finalizar, coloca-se o barco como parado, para não mover mais ele;
+        }
+
+        if (gameData.endGame() == WIN || gameData.endGame() == LOSE) {
+            return 0;
         }
 
         window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;

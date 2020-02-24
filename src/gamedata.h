@@ -6,6 +6,8 @@
 #include <SFML/System.hpp>
 #include <bits/stdc++.h>
 
+#include "phrase.h"
+
 /*
 
 class GameData
@@ -18,9 +20,11 @@ VARIÁVEIS PÚBLICAS:
 
 FUNÇÕES PÚBLICAS:
 - GameData() -> É o construtor padrão do jogo, nele coloca os dados iniciais do jogo, onde começam os personagens e tudo mais.
-- bool gameOver() -> É o verificador final do jogo, caso o jogador perca ou ganhe. Caso nada tiver acontecido, retorna-se 1. Caso o jogador tenha
+- bool verifyWinConditions() -> É o verificador final do jogo, caso o jogador perca ou ganhe. Caso nada tiver acontecido, retorna-se 1. Caso o jogador tenha
 perdido, retorna-se 2. Caso o jogador ganhe, retorna-se 3.
-
+- int endGame() -> Essa função irá tratar corretamente as win conditions e irá ver se o jogador ganhou ou perdeu. Caso tenha ocorrido um desses dois, ele irá
+printar algumas coisas de fim de jogo, como a pontuação.
+- void printStatistics(Phrase &time, Phrase &movements); -> Essa função irá printar quanto tempo tem de jogo, quantos movimentos já foram realizados, na tela de jogo.
 */
 class GameData {
     public:
@@ -30,8 +34,10 @@ class GameData {
 
     public:
         GameData();
-        int gameOver();
-
+        int verifyWinConditions();
+        int endGame();
+        void printStatistics(Phrase &time, Phrase &movements);
+        
 };
 
 #endif /* GAMEDATA_H */
