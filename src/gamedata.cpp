@@ -151,4 +151,17 @@ void GameData::initializeStacks (std::stack<sf::Vector2f> &leftSpaces, std::stac
     boatSpaces.push(sf::Vector2f(1065, 680));
 }
 
+/*
+
+void GameData::gameOverScreen (sf::Window &window)
+
+*/
+void GameData::gameOverScreen (sf::Window &window)
+{
+
+
+
+
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -31,6 +31,9 @@
 #define LOSE 1
 #define WIN 2
 
+sf::Color darkBlue (0,72,186); //Colocando uma cor mais harmoniosa no jogo;
+sf::Color brown (150, 75, 0); //Setando a cor para utilizala no men;
+
 
 //--------------------------------------------------------- JOGO --------------------------------------------------------------------------
 
@@ -49,8 +52,6 @@ int Jogo::mainMenu () {
     sf::Clock clock; //Relógio auxiliador da movimentação da tela no menu inicial;
 
     int currentX = 0; //Posição atual da textura, no eixo X;
-
-    sf::Color brown (150, 75, 0); //Setando a cor para utilizala no men;
 
     sf::Mouse mouse; //Declarando o mouse, para pegar as suas posições no futuro;
 
@@ -122,9 +123,8 @@ int Jogo::mainMenu () {
                 if (jogar.isHovering(mouse.getPosition(window))) {
                     start(); //Chama a função principal do jogo;
 
-                    if (jogar.isHovering(mouse.getPosition(window))) { //Essa verificação é infelizmente necessária para não apresentar um bug na hora de voltar;
+                    if (jogar.isHovering(mouse.getPosition(window))) //Essa verificação é infelizmente necessária para não apresentar um bug na hora de voltar;
                         jogar.text.setFillColor(sf::Color::Blue);
-                    }
                     else
                         jogar.text.setFillColor(sf::Color::Yellow);
                 }
@@ -173,6 +173,95 @@ int Jogo::mainMenu () {
     return 0; //TODO: Futuramente, caso seja necessário essa função deve retornar algum valor;
 }
 
+
+/*
+
+bool Jogo::startScreen()
+
+    Essa função tem como objetivo montar uma tela inicial, para preparar o jogador do início do jogo.
+
+@param
+@return
+
+
+*/
+
+bool Jogo::startScreen()
+{
+    sf::Mouse mouse; //Instanciando o mouse para pegar seus movimentos;
+
+    sf::Image white; //Colocando uma classe sf::Imagem, que serve para fazer uma mascara transparente, e deixar o fundo visualizavel;
+    white.create(WIDTH, HEIGHT, sf::Color::White);
+    white.createMaskFromColor(sf::Color::White, 100); //Aqui está colocando a mascara, deixando a imagem transparente;
+
+    Sprites startBackground (sf::Vector2f(1,1), sf::Vector2f(0,0)); //Instanciando o fundo do segundo menu, que basicamente se trata de um fundo cheio de estrelas;
+    Sprites whiteWindow (sf::Vector2f(0.5, 0.5), sf::Vector2f(WIDTH * 0.25, HEIGHT * 0.25)); //Dessa vez instanciando a sprite que será colocada a sf::Image transparente;
+
+    Phrase start ("Prontx para iniciar o jogo?", 70, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.31, WIDTH * 0.17)); //Colocando a frase de pergunta, para o jogador;
+    Phrase sim ("SIM, SIMBORA!", 50, sf::Color::White, sf::Vector2f(WIDTH * 0.41, WIDTH * 0.25)); //Colocando a opção de iniciar o jogo;
+    Phrase aindanao ("DAQUI A POUCO, TALVEZ :(", 50, sf::Color::White, sf::Vector2f(WIDTH * 0.342, WIDTH * 0.34)); //Ou a opção de voltar ao menu;
+
+    whiteWindow.texture.loadFromImage(white); //Nessa parte, estamos colocando a textura futura da sprite, e nesse caso colocamos a imagem transparente;
+    whiteWindow.sprite.setTexture(whiteWindow.texture); //Aplicando a textura transparente no sprite;
+
+    //Trazendo alguns dados dos arquivos, carregando fontes..;
+    if (!startBackground.setTexture("bin/espaco.png") || !start.setFont("bin/afanan.ttf") || !sim.setFont("bin/Pixel.ttf") || !aindanao.setFont("bin/Pixel.ttf"))
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
+
+        return 1;
+    }
+
+    while (window.isOpen())
+    {
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            case sf::Event::Closed: //Caso fechar a janela;
+                window.close();
+
+                return 0; //Retorna "sucesso";
+
+                break;
+
+            case sf::Event::MouseMoved:
+                if (sim.isHovering(mouse.getPosition(window))) //Do mesmo jeito feito no menu, caso ele coloque o mouse em cima, irá mudar de cor;
+                    sim.text.setFillColor(darkBlue); //Azul para opção;
+                else
+                    sim.text.setFillColor(sf::Color::White); //Branco para mouse fora;
+
+                if (aindanao.isHovering(mouse.getPosition(window))) //No mesmo caso do sim, agora trata-se da opção de voltar ao menu;
+                    aindanao.text.setFillColor(darkBlue);
+                else
+                    aindanao.text.setFillColor(sf::Color::White);
+
+                break;
+
+            case sf::Event::MouseButtonPressed:
+                if (sim.isHovering(mouse.getPosition(window))) //Caso o jogador clique em cima do sim, retorna true para a função start(), onde o valor será tratado;
+                    return true; //Retornando true;
+
+                if (aindanao.isHovering(mouse.getPosition(window))) //Caso contrário o jogador será recolocado no menu;
+                    return false; //Retornando false;
+
+                break;
+            }
+        }
+
+        window.clear(sf::Color::Black); //Limpando os dados anteriores que estavam mostrando na tela;
+
+        //Printando as sprites e textos que foram anunciadas acima;
+        window.draw(startBackground.sprite); 
+        window.draw(whiteWindow.sprite);
+        window.draw(start.text);
+        window.draw(sim.text);
+        window.draw(aindanao.text);
+
+        window.display(); //Mostrando todas as mudanças que foram feitas;
+    }
+}
+
 /*
 
 int Jogo::start()
@@ -184,11 +273,10 @@ int Jogo::start()
 
 */
 int Jogo::start() {
-    sf::Color darkBlue (0,72,186); //Colocando uma cor mais harmoniosa no jogo;
-
     int xinitial, xfinal, side;
     bool isCharAllFalse; //Essa variável é para saber se o mouse não está em cima de nenhum personagem, para auxiliar no barco;
     int winOrLose; //Verificação utilizada para ver se o jogador perdeu, para evitar algumas chamadas extras na função;
+    bool choose;
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
 
@@ -245,6 +333,14 @@ int Jogo::start() {
 
         return 1;
     }
+
+    choose = startScreen(); //Atribuindo a variavel escolha qual foi a escolha dele no 2o menu;
+
+    if (!choose) { //Caso ele tenha escolhido sair, o jogo não começa;
+        return 0;
+    }
+
+    gameData.gameTime.restart(); //Restartando o relógio por causa do 2o menu;
 
     while (window.isOpen()) //Enquanto a janela está aberta;
     {
@@ -339,11 +435,6 @@ int Jogo::start() {
                     character[i].brightsprite.setPosition(character[i].sprite.getPosition()); //Arruma a sprite de opção, que não precisa ficar acompanhando todo o tempo;
                 }
             }
-
-            //PRINTANDO ALGUNS DADOS NO CONSOLE
-            std::cout << "# Alguns dados: " << gameData.moves << " movimentos." << std::endl;
-            std::cout << "No lado direito: " << gameData.rightSideCanibals << " canibais | " << gameData.rightSidePriests << " priests" << std::endl;
-            std::cout << "No lado esquerdo: " << 3 - gameData.rightSideCanibals << " canibais | " << 3 - gameData.rightSidePriests << " priests" << std::endl << std::endl;
             
             boat.moveBoatFreePos(boatSpaces); //Movendo as posições do barco, para colocar elas no local certo agora que o barco se moveu;
             boat.moving = false; //Para finalizar, coloca-se o barco como parado, para não mover mais ele;

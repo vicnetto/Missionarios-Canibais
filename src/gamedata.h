@@ -48,6 +48,7 @@ class GameData {
         int verifyWinConditions(Character (&character) [6]);
         void printStatistics(Phrase &time, Phrase &movements);
         void initializeStacks (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &boatSpaces);
+        void gameOverScreen (sf::Window &window);
 };
 
 #endif /* GAMEDATA_H */
