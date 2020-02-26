@@ -1,5 +1,6 @@
-#include <iostream>
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include <bits/stdc++.h>
 
 #include "jogo.h"
 

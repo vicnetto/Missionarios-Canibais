@@ -51,6 +51,14 @@ dentro da classe Jogo.
 int Jogo::mainMenu () {
     sf::Clock clock; //Relógio auxiliador da movimentação da tela no menu inicial;
 
+    GameData gameData;
+
+    std::stack<sf::Vector2f> leftSpaces;
+    std::stack<sf::Vector2f> rightSpaces;
+    std::stack<sf::Vector2f> boatSpaces;
+
+    gameData.initializeStacks(leftSpaces, boatSpaces);
+
     int currentX = 0; //Posição atual da textura, no eixo X;
 
     sf::Mouse mouse; //Declarando o mouse, para pegar as suas posições no futuro;
@@ -121,7 +129,7 @@ int Jogo::mainMenu () {
 
             case sf::Event::MouseButtonPressed: //Caso alguma tecla do mouse seja ativada;
                 if (jogar.isHovering(mouse.getPosition(window))) {
-                    start(); //Chama a função principal do jogo;
+                    start(gameData, leftSpaces, rightSpaces, boatSpaces); //Chama a função principal do jogo;
 
                     if (jogar.isHovering(mouse.getPosition(window))) //Essa verificação é infelizmente necessária para não apresentar um bug na hora de voltar;
                         jogar.text.setFillColor(sf::Color::Blue);
@@ -249,7 +257,7 @@ bool Jogo::startScreen()
             }
         }
 
-        window.clear(sf::Color::Black); //Limpando os dados anteriores que estavam mostrando na tela;
+        window.clear(sf::Color::Black);
 
         //Printando as sprites e textos que foram anunciadas acima;
         window.draw(startBackground.sprite); 
@@ -272,11 +280,11 @@ int Jogo::start()
 @return int
 
 */
-int Jogo::start() {
+int Jogo::start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &rightSpaces, std::stack<sf::Vector2f> &boatSpaces) {
     int xinitial, xfinal, side;
     bool isCharAllFalse; //Essa variável é para saber se o mouse não está em cima de nenhum personagem, para auxiliar no barco;
     int winOrLose; //Verificação utilizada para ver se o jogador perdeu, para evitar algumas chamadas extras na função;
-    bool choose;
+    bool choose; //Escolha do jogador na 2a tela do menu;
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
 
@@ -286,17 +294,14 @@ int Jogo::start() {
     Phrase movimentos("Movimentos: ", 50, darkBlue, sf::Vector2f(WIDTH * 0.45, HEIGHT * 0.01));
     Phrase movements ("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.58, HEIGHT * 0.01)); //Esses dois movimentos são a quantidade de movimentos que o jogador realizou;
 
+    Phrase movimentosTotais("Total de Mov.: ", 50, darkBlue, sf::Vector2f(WIDTH * 0.45, HEIGHT * 0.08));
+    Phrase totalMovements("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.60, HEIGHT * 0.08));
+
     Phrase tentativas("Tentativas: ", 50, darkBlue, sf::Vector2f(WIDTH * 0.20, HEIGHT * 0.01));
     Phrase attempts("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.33, HEIGHT * 0.01)); //Aqui são as tentativas, cada vez que o jogador perde soma-se 1 na quantidade;
 
 
-    GameData gameData; //Alocando espaço para a classe onde os dados serão armazenados no jogo;
-
-    std::stack<sf::Vector2f> leftSpaces;
-    std::stack<sf::Vector2f> rightSpaces;
-    std::stack<sf::Vector2f> boatSpaces;
-
-    gameData.initializeStacks(leftSpaces, boatSpaces);
+    //GameData gameData; //Alocando espaço para a classe onde os dados serão armazenados no jogo;
 
     Sprites background (sf::Vector2f(1, 1), sf::Vector2f(0,0)); //Iniciando o sprite que carregará o fundo;
 
@@ -310,8 +315,17 @@ int Jogo::start() {
     character[4].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1640, 450));
     character[5].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 750));
 
+    sf::Image whiteOption; //Colocando uma classe sf::Imagem, que serve para fazer uma mascara transparente, e deixar o fundo visualizavel;
+    whiteOption.create(WIDTH, HEIGHT, sf::Color::White);
+    whiteOption.createMaskFromColor(sf::Color::White, 100); //Aqui está colocando a mascara, deixando a imagem transparente;
+
+    Sprites whiteWindowOption (sf::Vector2f(0.3, 0.15), sf::Vector2f(WIDTH * 0.34, HEIGHT * 0.4)); //Dessa vez instanciando a sprite que será colocada a sf::Image transparente;
+
+    whiteWindowOption.texture.loadFromImage(whiteOption); //Nessa parte, estamos colocando a textura futura da sprite, e nesse caso colocamos a imagem transparente;
+    whiteWindowOption.sprite.setTexture(whiteWindowOption.texture); //Aplicando a textura transparente no sprite;
+
     //Inicializando as texturas dos textos que agora foram inseridos no jogo, para mostrar o desempenho do jogador;
-    if (!time.setFont("bin/afanan.ttf") || !tempo.setFont("bin/afanan.ttf") || !movimentos.setFont("bin/afanan.ttf") || !movements.setFont("bin/afanan.ttf") || !tentativas.setFont("bin/afanan.ttf") || !attempts.setFont("bin/afanan.ttf")) 
+    if (!time.setFont("bin/afanan.ttf") || !tempo.setFont("bin/afanan.ttf") || !movimentos.setFont("bin/afanan.ttf") || !movements.setFont("bin/afanan.ttf") || !tentativas.setFont("bin/afanan.ttf") || !attempts.setFont("bin/afanan.ttf") || !movimentosTotais.setFont("bin/afanan.ttf") ||!totalMovements.setFont("bin/afanan.ttf")) 
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
@@ -376,8 +390,20 @@ int Jogo::start() {
                 break;
             
                 case sf::Event::KeyPressed: //Essa verificação é sobre o teclado, caso o jogador aperte o ESC, para voltar para o menu;
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) //ESCAPE == ESC
-                       return 0;
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {//ESCAPE == ESC
+
+                        //Zerando o gameData abaixo caso o jogador aperte ESC para sair;
+                        gameData.numbAttempts = 0; 
+                        gameData.currentNumbAttempts = 0;
+
+                        gameData.totalMoves = 0;
+                        gameData.currentTotalMoves = 0;
+
+                        gameData.gameTime.restart();
+                        gameData.currentTime = 0;
+
+                        return 0;
+                    }
 
                 break;
 
@@ -385,6 +411,7 @@ int Jogo::start() {
                     if (boat.isHovering(mouse.getPosition(window)) && isCharAllFalse == true) {
                         if (boat.quantChar != 0){ //Caso o barco tenha apenas mais de 0 jogadores, pois vazio ele não pode andar;
                             gameData.moves += 1; //Soma um no movimento do barco;
+                            gameData.totalMoves += 1; //Soma um nos movimentos totais do barco;
 
                             boat.moveBoat(); //Chama a função de mover o barco, caso ele clique no barco;
                         }
@@ -440,24 +467,23 @@ int Jogo::start() {
             boat.moving = false; //Para finalizar, coloca-se o barco como parado, para não mover mais ele;
         }
 
+        gameData.printStatistics(time, movements, attempts, totalMovements);
+
         winOrLose = gameData.verifyWinConditions(character); //Verificando se o jogador venceu o ganhou, chamando a função verifyWinConditions();
-
-        if (winOrLose == WIN || winOrLose == LOSE) { //Agora sim comparando o resultado para ver vitória ou derrota;
-            return 0;
-        }
-
-        gameData.printStatistics(time, movements);
 
         window.clear(sf::Color::Black); //Limpando as representações antigas que estavam dispostas na janela;
 
         window.draw(background.sprite); //Colocando o fundo do jogo;
         
+        //Fazendo os prints gerais do texto;
         window.draw(tempo.text);
         window.draw(time.text);
         window.draw(movimentos.text);
         window.draw(movements.text);
         window.draw(tentativas.text);
         window.draw(attempts.text);
+        window.draw(movimentosTotais.text);
+        window.draw(totalMovements.text);
 
         if (boat.bright == false) //Colocando a opção em cima do barco, para o jogador saber que é possível mover o barco;
             window.draw(boat.sprite);
@@ -469,6 +495,22 @@ int Jogo::start() {
                 window.draw(character[i].sprite);
             else
                 window.draw(character[i].brightsprite);
+        }
+
+        if (winOrLose == WIN || winOrLose == LOSE) { //Agora sim comparando o resultado para ver vitória ou derrota;
+            if (winOrLose == LOSE) { //Caso seja uma derrota
+                window.draw(whiteWindowOption.sprite); //Deseja a janela transparente;
+
+                gameData.gameOverScreen(window); //Faz a opção de jogar novamente;
+
+                //Reseta algumas variáveis;
+                gameData.moves = 0; //Reseta os movimentos do jogador, pois só deixa salvo os movimentos totais;
+                gameData.currentMoves = 0; //Reseta os movimentos do momento, pelo mesmo motivo acima;
+                gameData.numbAttempts += 1; //Numero de tentativas aumenta um, porque o jogador perdeu o jogo;
+
+                //Essa função reseta toda a stack e coloca tudo novamente, para ajeitar o jogo para ajeitar para o jogador novamente;
+                gameData.resetStacksAndReplace(leftSpaces, boatSpaces, rightSpaces, character, boat);
+            }
         }
 
         window.display(); //Mostrando quais foram as alterações no fundo;

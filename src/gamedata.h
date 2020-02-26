@@ -8,6 +8,9 @@
 
 #include "phrase.h"
 #include "character.h"
+#include "boat.h"
+
+
 
 /*
 
@@ -31,24 +34,33 @@ perdido, retorna-se 2. Caso o jogador ganhe, retorna-se 3.
 - void printTime(Phrase &time, sf::Clock &currentGameTime) -> Essa função irá printar quanto tempo tem de jogo.
 - void initializeStacks (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &boatSpaces) -> Essa função serve para tirar um pouco de instanciações
 do jogo.cpp, para descarregar um pouco aquela função.
+- void resetStacksAndReplace (...) -> Essa função, extremamente imporante para o reinício do jogo, serve para resetar todas as posições dos personagens e as
+posições disponíveis para o jogador nos outros lados.
+- void gameOverScreen (sf::Window &window) -> Essa função tem como objetivo printar para o jogador quais foram os personagens que morreram e perguntar
+se o jogador quer iniciar o jogo novamente.
 */
 class GameData {
     public:
         int moves;
+        int totalMoves;
+        int numbAttempts;
         int rightSideCanibals;
         int rightSidePriests;
 
         int currentTime;
         int currentMoves;
+        int currentTotalMoves;
+        int currentNumbAttempts;
 
         sf::Clock gameTime;
 
     public:
         GameData();
         int verifyWinConditions(Character (&character) [6]);
-        void printStatistics(Phrase &time, Phrase &movements);
+        void printStatistics(Phrase &time, Phrase &movements, Phrase &attempts, Phrase &totalMovements);
         void initializeStacks (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &boatSpaces);
-        void gameOverScreen (sf::Window &window);
+        void resetStacksAndReplace (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &boatSpaces, std::stack<sf::Vector2f> &rightSpaces, Character (&character) [6], Boat &boat);
+        void gameOverScreen (sf::RenderWindow &window);
 };
 
 #endif /* GAMEDATA_H */

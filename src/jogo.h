@@ -4,6 +4,8 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+#include "gamedata.h"
+
 #define WIDTH 1920
 #define HEIGHT 1080
 
@@ -32,7 +34,7 @@ class Jogo {
 
     public:
         int mainMenu ();
-        int start ();
+        int start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &rightSpaces, std::stack<sf::Vector2f> &boatSpaces);
         bool startScreen ();
 };
 

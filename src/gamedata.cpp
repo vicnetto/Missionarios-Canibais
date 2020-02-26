@@ -6,6 +6,11 @@
 #include "gamedata.h"
 #include "phrase.h"
 #include "character.h"
+#include "boat.h"
+
+#define RIGHTSIDE 3
+#define SCALEPRIEST sf::Vector2f(0.32, 0.32) //Tamanho da sprite do padre;
+#define SCALECANNIBAL sf::Vector2f(0.385, 0.385) //Tamanho da sprite do canibal;
 
 #define MAXIMUMCHARSINONESIDE 3
 #define CONTINUE 0 
@@ -18,6 +23,9 @@
 #define LEFTBOATSIDE 1
 #define RIGHTBOATSIDE 2
 #define RIGHTSIDE 3
+
+#define WIDTH 1920 
+#define HEIGHT 1080
 
 
 //------------------------------------------------------ GAMEDATA ----------------------------------------------------------------------------
@@ -35,11 +43,14 @@ GameData::GameData()
 GameData::GameData() 
 {
     moves = 0;
+    numbAttempts = 0;
     rightSideCanibals = 3;
     rightSidePriests = 3;
 
     currentTime = 0;
     currentMoves = 0;
+    currentTotalMoves = 0;
+    currentNumbAttempts = 0;
 }
 
 /*
@@ -90,7 +101,7 @@ int GameData::verifyWinConditions(Character (&character) [6])
 
 /*
 
-void GameData::printTime() 
+void GameData::printStatistics() 
 
     Essa função irá printar quanto tempo tem de jogo, quantos movimentos já foram realizados, na tela de jogo.
 
@@ -101,27 +112,43 @@ executou.
 
 */
 
-void GameData::printStatistics(Phrase &time, Phrase &movements) 
+void GameData::printStatistics(Phrase &time, Phrase &movements, Phrase &attempts, Phrase &totalMovements) 
 {
-    std::string timeOnStringForm; //Instânciando o tempo como string que será usado para alterar o texto;
-    std::string movesOnStringForm; //Colocando a quantidade de movimentos em string para colocar na frente em texto;
+    std::string onStringForm; //Instânciando o tempo como string que será usado para alterar o texto;
 
     if (gameTime.getElapsedTime().asSeconds() > currentTime) { //Comparando o tempo atual com o antigo que estava printado;
         currentTime = gameTime.getElapsedTime().asSeconds();  //Pegando o tempo atual;
 
-        timeOnStringForm = std::to_string(currentTime); //Transformando para string;
+        onStringForm = std::to_string(currentTime); //Transformando para string;
 
-        time.text.setString(timeOnStringForm); //Atribuindo realmente para o texto, para ser printado na proxima execução da tela;
+        time.text.setString(onStringForm); //Atribuindo realmente para o texto, para ser printado na proxima execução da tela;
     }
 
-    if (moves > currentMoves) { //Aqui fazendo a mesma verificação do tempo, caso a quantidade de movimentos seja alterada;
+    if (moves > currentMoves || moves == 0) { //Aqui fazendo a mesma verificação do tempo, caso a quantidade de movimentos seja alterada;
         currentMoves = moves; //Atribuindo a quantidade de movimentos alterada;
 
-        movesOnStringForm = std::to_string(currentMoves); //Transformando para string;
+        onStringForm = std::to_string(currentMoves); //Transformando para string;
 
-        movements.text.setString(movesOnStringForm); //Colocando realmente agora no texto;
+        movements.text.setString(onStringForm); //Colocando realmente agora no texto;
     }
 
+    if (totalMoves > currentTotalMoves) {
+        currentTotalMoves = totalMoves; //Atribuindo a quantidade de movimentos totais alterada;
+
+        onStringForm = std::to_string(currentTotalMoves); //Transformando para string;
+
+        totalMovements.text.setString(onStringForm); //Colocando realmente agora no texto;
+
+    }
+
+    if (numbAttempts > currentNumbAttempts) {
+        currentNumbAttempts = numbAttempts; //Atribuindo a quantidade de tentativas alterada;
+
+        onStringForm = std::to_string(currentNumbAttempts); //Transformando para string;
+
+        attempts.text.setString(onStringForm); //Colocando realmente agora no texto;
+
+    }
 }
 
 /*
@@ -153,15 +180,125 @@ void GameData::initializeStacks (std::stack<sf::Vector2f> &leftSpaces, std::stac
 
 /*
 
-void GameData::gameOverScreen (sf::Window &window)
+void GameData::gameOverScreen (sf::RenderWindow &window)
+
+    Essa função tem como objetivo printar para o jogador quais foram os personagens que morreram e perguntar
+se o jogador quer iniciar o jogo novamente.
 
 */
-void GameData::gameOverScreen (sf::Window &window)
+void GameData::gameOverScreen (sf::RenderWindow &window)
 {
+    Phrase voceperdeu ("TENTAR NOVAMENTE", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.365, HEIGHT * 0.44)); //Texto de tentar novamente que aparece caso o jogador perca;
 
+    sf::Event event; //Instanciando o tratador de evento;
+    sf::Mouse mouse; //Instanciando o que vai salvar os movimentos do mouse;
 
+    if (!voceperdeu.setFont("bin/Pixel.ttf")) //Colocando o arquivo da fonte dentro da frase e verificando se é possível abrir o arquivo;
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl; //Frase caso não seja possível abrir o arquivo;
 
+        return;
+    }
 
+    while (window.isOpen())
+    {
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            case sf::Event::Closed: //Caso fechar a janela;
+                window.close();
+
+                return; //Retorna;;
+
+                break;
+            
+
+            case sf::Event::MouseMoved:
+                if (voceperdeu.isHovering(mouse.getPosition(window))) { //Faz o tratamento clássico caso o mouse passe por cima da frase;
+                    voceperdeu.text.setFillColor(sf::Color::Blue); //Coloca cor azul caso esteja em cima;
+                } else {
+                    voceperdeu.text.setFillColor(sf::Color::Yellow); //Ou amarelo caso não esteja em cima;
+                }
+                
+            break;
+
+            case sf::Event::MouseButtonPressed:
+                if (voceperdeu.isHovering(mouse.getPosition(window))) //Quando aperta, ele verifica se está em cima e retorna diretamente para a função start() novamente;
+                    return;
+            }
+        }
+
+        window.draw(voceperdeu.text); //Printa o texto;
+
+        window.display(); //Mostrando todas as mudanças que foram feitas;
+    }
+}
+
+/*
+
+void GameData::resetStacksAndReplace (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &boatSpaces, std::stack<sf::Vector2f> &rightSpaces, Character (&character) [6], Boat &boat)
+
+    Essa função, extremamente imporante para o reinício do jogo, serve para resetar todas as posições dos personagens e as
+posições disponíveis para o jogador nos outros lados.
+
+@param std::stack<sf::Vector2f> &leftSpaces -> São os espaços livres no lado direito do mapa, ou seja, no lado contrário da onde os personagens
+"nascem".
+@param std::stack<sf::Vector2f> &boatSpaces -> São os espaços livres dentro do barco.
+@param std::stack<sf::Vector2f> &rightSpaces -> São os espaços livres dos personagens no lado direito, que nesse caso, na hora de resetar o jogo
+ela deve estar vazia.
+@param Character (&character) [6] -> São os 6 personagens, que são passados nessa função para resetar todas as suas posições e localizações.
+@param Boat &boat -> Essa parte serve para mexer com o barco, para mudar a sua posição e alterar as posições livres dentro dele.
+@return
+
+*/
+void GameData::resetStacksAndReplace (std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &boatSpaces, std::stack<sf::Vector2f> &rightSpaces, Character (&character) [6], Boat &boat)
+{
+    rightSideCanibals = 3; //Inicialmente, existem 3 canibais do lado direito;
+    rightSidePriests = 3; //E também exitem 3 padres do lado direito;
+
+    //Primeiro resetando todas as stacks;
+    while (!leftSpaces.empty())
+        leftSpaces.pop();
+
+    while (!boatSpaces.empty())
+        boatSpaces.pop();
+
+    while (!rightSpaces.empty())
+        rightSpaces.pop();
+
+    //Atribuindo os lugares escolhidos para os personagens no lado esquerdo;
+    leftSpaces.push(sf::Vector2f(100, 150));
+    leftSpaces.push(sf::Vector2f(300, 140));
+    leftSpaces.push(sf::Vector2f(500, 130));
+    leftSpaces.push(sf::Vector2f(120, 450));
+    leftSpaces.push(sf::Vector2f(360, 450));
+    leftSpaces.push(sf::Vector2f(110, 740));
+
+    //Atribuindo os lugares dos barcos, iniciais pelo menos;
+    boatSpaces.push(sf::Vector2f(1240, 680));
+    boatSpaces.push(sf::Vector2f(1065, 680));
+
+    //Setando todas as localidades dos personagens novamente, para deixar eles no local certo apos o reset do jogo;
+    character[0].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1200, 180));
+    character[1].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1430, 170));
+    character[2].setCharacter(true, RIGHTSIDE, SCALEPRIEST, sf::Vector2f(1420, 450));
+    character[3].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 160));
+    character[4].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1640, 450));
+    character[5].setCharacter(false, RIGHTSIDE, SCALECANNIBAL, sf::Vector2f(1650, 750));
+
+    //Tirando as texturas de morte atribuidas para os padres no final do jogo;
+    character[0].setTexture("bin/padre1.png");
+    character[1].setTexture("bin/padre1.png");
+    character[2].setTexture("bin/padre1.png");
+
+    //Mudando todas as configurações do barco para as iniciais novamente;
+    boat.sprite.setPosition(sf::Vector2f(1032, 900));
+    boat.brightsprite.setPosition(sf::Vector2f(1032, 900));
+    boat.isOnTheLeft = false;
+    boat.quantChar = 0;
+    boat.sprite.setScale(0.5, 0.5);
+    boat.brightsprite.setScale(0.5, 0.5);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
