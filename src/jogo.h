@@ -34,8 +34,9 @@ class Jogo {
 
     public:
         int mainMenu ();
-        int start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &rightSpaces, std::stack<sf::Vector2f> &boatSpaces);
+        int start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &rightSpaces, std::stack<sf::Vector2f> &boatSpaces, bool isJustToPrint);
         bool startScreen ();
+        void gameWinScreen (Character character [6], Boat boat, Sprites background, Sprites whiteWindowOption, GameData gameData);
 };
 
 #endif /* JOGO_H */

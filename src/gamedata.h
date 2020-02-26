@@ -52,6 +52,8 @@ class GameData {
         int currentTotalMoves;
         int currentNumbAttempts;
 
+        int totalTime;
+
         sf::Clock gameTime;
 
     public:
