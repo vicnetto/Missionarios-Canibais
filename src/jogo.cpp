@@ -402,6 +402,8 @@ int Jogo::start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::
                         gameData.gameTime.restart();
                         gameData.currentTime = 0;
 
+                        gameData.resetStacksAndReplace(leftSpaces, boatSpaces, rightSpaces, character, boat);
+
                         return 0;
                     }
 
@@ -433,7 +435,7 @@ int Jogo::start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::
 
             boat.sprite.move(boat.speed, 0); //Move a sprite do barco mas em uma velocidade bem pequena;
             boat.brightsprite.move(boat.speed, 0); //Move a sprite de opção do barco na mesma velocidade;
-
+            
             for (int i = 0; i < NUMBEROFCHARS; i++){ //Esse laço serve para mover caso existam personagens em cima do barco;
                 if (character[i].location == BOATRIGHTSIDE || character[i].location == BOATLEFTSIDE) { //Se ele estiver no barco, em qualquer lado, ele deve ir junto;
                     character[i].sprite.move(boat.speed, 0);
