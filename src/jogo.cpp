@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <bits/stdc++.h>
 
@@ -31,6 +32,12 @@
 #define LOSE 1
 #define WIN 2
 
+#define TIMEFORANIMATION 1.5
+#define XFINALATTEMPTS 700
+#define XFINALMOVES 705
+#define XFINALTIME 704.5
+#define XFINALTOTALMOVES 704
+
 sf::Color darkBlue (0,72,186); //Colocando uma cor mais harmoniosa no jogo;
 sf::Color brown (150, 75, 0); //Setando a cor para utilizala no men;
 
@@ -50,16 +57,11 @@ dentro da classe Jogo.
 */
 int Jogo::mainMenu () {
     sf::Clock clock; //Relógio auxiliador da movimentação da tela no menu inicial;
-
-    GameData gameData;
-
-    std::stack<sf::Vector2f> leftSpaces;
-    std::stack<sf::Vector2f> rightSpaces;
-    std::stack<sf::Vector2f> boatSpaces;
-
-    gameData.initializeStacks(leftSpaces, boatSpaces);
+    sf::Clock secondClock;
 
     int currentX = 0; //Posição atual da textura, no eixo X;
+    bool loading = true;
+    bool lightning = true;
 
     sf::Mouse mouse; //Declarando o mouse, para pegar as suas posições no futuro;
 
@@ -76,6 +78,21 @@ int Jogo::mainMenu () {
     Sprites biblia (sf::Vector2f(0.3, 0.3), sf::Vector2f(WIDTH / 6.2, HEIGHT / 9)); //Colocando um pequeno detalhe de biblia ao lado do nome dos missionários.
     Sprites faca (sf::Vector2f(0.25, 0.25), sf::Vector2f(WIDTH * 3 / 5.3, (HEIGHT / 5.3))); //Sprite de faca ao lado do nome dos canibais.
     Sprites peteco (sf::Vector2f(0.2, 0.2), sf::Vector2f(WIDTH * 0.05, HEIGHT * 0.92)); //Logo do PETECO, o grande influenciador do projeto.
+    Sprites petecoGrande (sf::Vector2f(0.8, 0.8), sf::Vector2f(WIDTH * 0.35, HEIGHT * 0.4));
+
+    sf::SoundBuffer som;
+
+    if (!som.loadFromFile("bin/bigthu.ogg"))
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the sound." << std::endl;
+
+        return 1;
+    }
+
+    sf::Sound raio;
+    raio.setBuffer(som);
+    raio.setVolume(6.0f);
+
 
     //Aqui é a verificação se existem os arquivos das fontes;
     if (!miss.setFont("bin/FFF_Tusj.ttf") || !jogar.setFont("bin/afanan.ttf") || !sair.setFont("bin/afanan.ttf") || !comojogar.setFont("bin/afanan.ttf") || !e.setFont("bin/Vegan.ttf") || !cani.setFont("bin/Nightmare.ttf") || !victornetto.setFont("bin/Amilya.ttf"))
@@ -86,18 +103,16 @@ int Jogo::mainMenu () {
     }
 
     //Verifica se o arquivo da textura está disponível, caso contrário reporta o erro para o main, e para o console;
-    if (!fundo.setTexture("bin/Background.png") || !biblia.setTexture("bin/biblia.png") || !faca.setTexture("bin/faca.png") || !peteco.setTexture("bin/LogoPETECO.png")) //Carregando o fundo do menu;
+    if (!fundo.setTexture("bin/Background.png") || !biblia.setTexture("bin/biblia.png") || !faca.setTexture("bin/faca.png") || !peteco.setTexture("bin/LogoPETECO.png") || !petecoGrande.setTexture("bin/LogoPETECO.png")) //Carregando o fundo do menu;
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
         return 1;
     }
 
-    //fundo.texture.setSmooth(true); //Colocando uma suavidade na textura;
+    while (window.isOpen()) {//Começando o loop principal do menu;
 
-    while (window.isOpen()) //Começando o loop principal do menu;
-    {
-
+        //if (secondClock.getElapsedTime().asSeconds() > 5.4)
         while (window.pollEvent(event))
         {
             switch (event.type)
@@ -129,7 +144,7 @@ int Jogo::mainMenu () {
 
             case sf::Event::MouseButtonPressed: //Caso alguma tecla do mouse seja ativada;
                 if (jogar.isHovering(mouse.getPosition(window))) {
-                    start(gameData, leftSpaces, rightSpaces, boatSpaces, false); //Chama a função principal do jogo;
+                    start(); //Chama a função principal do jogo;
 
                     if (jogar.isHovering(mouse.getPosition(window))) //Essa verificação é infelizmente necessária para não apresentar um bug na hora de voltar;
                         jogar.text.setFillColor(sf::Color::Blue);
@@ -141,24 +156,46 @@ int Jogo::mainMenu () {
                     return 0;
 
                 break;
+
+            case sf::Event::Resized:
+                sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+                
+                window.setView(sf::View(visibleArea));
+            break;
             }
         }
 
-        window.clear(sf::Color::Black); //Limpa a tela e coloca uma cor inicial;
+        if (secondClock.getElapsedTime().asSeconds() < 5) {
+            window.draw(fundo.sprite);
 
-        window.draw(fundo.sprite); //Nessa linha e abaixo, printando os sprites;
-        window.draw(biblia.sprite);
-        window.draw(faca.sprite);
-        window.draw(peteco.sprite);
+            window.draw(petecoGrande.sprite);
+        } else if (secondClock.getElapsedTime().asSeconds() > 5 && secondClock.getElapsedTime().asSeconds() < 6.05) {
+            window.draw(fundo.sprite);
 
-        window.draw(miss.text); //Escreve a palavra depois de ter limpado;
-        window.draw(e.text);
-        window.draw(cani.text);
-        window.draw(victornetto.text);
+            if (secondClock.getElapsedTime().asSeconds() > 5.675) {
+                if (lightning == true) {
+                    raio.play();
 
-        window.draw(jogar.text); //Nessa linha e abaixo, colocando as opções do menu;
-        window.draw(sair.text);
-        window.draw(comojogar.text);
+                    lightning = false;
+                }
+            }
+        } else {
+            window.clear(sf::Color::Black); //Limpa a tela e coloca uma cor inicial;
+
+            window.draw(fundo.sprite); //Nessa linha e abaixo, printando os sprites;
+            window.draw(biblia.sprite);
+            window.draw(faca.sprite);
+
+            window.draw(miss.text); //Escreve a palavra depois de ter limpado;
+            window.draw(e.text);
+            window.draw(cani.text);
+            window.draw(victornetto.text);
+            window.draw(peteco.sprite);
+
+            window.draw(jogar.text); //Nessa linha e abaixo, colocando as opções do menu;
+            window.draw(sair.text);
+            window.draw(comojogar.text);
+        }
 
         window.display(); //Mostra novamente o que está sendo printado na tela;
 
@@ -280,11 +317,26 @@ int Jogo::start()
 @return int
 
 */
-int Jogo::start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &rightSpaces, std::stack<sf::Vector2f> &boatSpaces, bool isJustToPrint) {
+int Jogo::start () {
+    bool choose; //Escolha do jogador na 2a tela do menu;x
+
+    choose = startScreen(); //Atribuindo a variavel escolha qual foi a escolha dele no 2o menu;
+
+    if (!choose) { //Caso ele tenha escolhido sair, o jogo não começa;
+        return 0;
+    }
+
     int xinitial, xfinal, side;
     bool isCharAllFalse; //Essa variável é para saber se o mouse não está em cima de nenhum personagem, para auxiliar no barco;
     int winOrLose; //Verificação utilizada para ver se o jogador perdeu, para evitar algumas chamadas extras na função;
-    bool choose; //Escolha do jogador na 2a tela do menu;
+
+    GameData gameData;
+
+    std::stack<sf::Vector2f> leftSpaces;
+    std::stack<sf::Vector2f> rightSpaces;
+    std::stack<sf::Vector2f> boatSpaces;
+
+    gameData.initializeStacks(leftSpaces, boatSpaces);
 
     sf::Mouse mouse; //Variável para pegar os movimentos do mouse;
 
@@ -348,12 +400,6 @@ int Jogo::start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::
         return 1;
     }
 
-    choose = startScreen(); //Atribuindo a variavel escolha qual foi a escolha dele no 2o menu;
-
-    if (!choose) { //Caso ele tenha escolhido sair, o jogo não começa;
-        return 0;
-    }
-
     gameData.gameTime.restart(); //Restartando o relógio por causa do 2o menu;
 
     while (window.isOpen()) //Enquanto a janela está aberta;
@@ -391,19 +437,6 @@ int Jogo::start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::
             
                 case sf::Event::KeyPressed: //Essa verificação é sobre o teclado, caso o jogador aperte o ESC, para voltar para o menu;
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {//ESCAPE == ESC
-
-                        //Zerando o gameData abaixo caso o jogador aperte ESC para sair;
-                        gameData.numbAttempts = 0; 
-                        gameData.currentNumbAttempts = 0;
-
-                        gameData.totalMoves = 0;
-                        gameData.currentTotalMoves = 0;
-
-                        gameData.gameTime.restart();
-                        gameData.currentTime = 0;
-
-                        gameData.resetStacksAndReplace(leftSpaces, boatSpaces, rightSpaces, character, boat);
-
                         return 0;
                     }
 
@@ -531,6 +564,10 @@ int Jogo::start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::
                 gameData.currentTotalMoves = 0;
 
                 gameWinScreen(character, boat, background, whiteWindowOption, gameData);
+
+                //AQUI VAI SALVAR OS DADOS NO ARQUIVO;
+
+                return 0;
             }
         }
 
@@ -550,17 +587,26 @@ void Jogo::gameWinScreen()
     Essa função tem o objetivo de mostrar quando o jogador ganhou o jogo, pedir o seu nome e a sua idade
 para futuramente tivermos dados suficientes para fazer uma pesquisa.
 
-@param
+@param Character character [6] -> Passa todos os personagens como objeto, somente para poder printar eles normalmente.
+@param Boat boat -> Para poder printar o barco, ele é passado como objeto.
+@param Sprites background -> Evitando um carregamento desnecessário, passa-se também o fundo por objeto.
+@param Sprites whiteWindowOption -> A janela de opções instanciada no start() para quando o jogador perde o jogo, é
+utilizada novamente porém em um novo formato.
+@param GameData gameData -> Para printar os dados do jogo, é passado como objeto o gameData.
 @return
 
 */
 
 void Jogo::gameWinScreen(Character character [6], Boat boat, Sprites background, Sprites whiteWindowOption, GameData gameData)
 {
-    bool printEverythingOneTime = true;
+    bool printEverythingOneTime = true; //Essa variável serve para atualizar somente uma vez os dados do jogo, visando que eles não serão mudados durante a tela de derrota;
+    bool moving = true; //Enquanto está tendo a animação dos dados do jogo isso permanece true;
+    int movingVerficator = 0; //Verificador para ver se todos os parâmetros já chegaram no final, para evitar atualizações desnecessárias;
 
-    whiteWindowOption.sprite.setScale(sf::Vector2f(0.3, 0.6));
-    whiteWindowOption.sprite.setPosition(sf::Vector2f(WIDTH * 0.34, HEIGHT * 0.2));
+    sf::Mouse mouse; //Verificador do mouse, para ver onde está sua posição;
+
+    whiteWindowOption.sprite.setScale(sf::Vector2f(0.35, 0.65)); //Aumentando o tamanho da janela e reposicionando ela abaixo para deixar ajeitada para o fim de jogo;
+    whiteWindowOption.sprite.setPosition(sf::Vector2f((WIDTH / 2) - (whiteWindowOption.sprite.getGlobalBounds().width / 2), (HEIGHT / 2) - (whiteWindowOption.sprite.getGlobalBounds().height / 2)));
 
     Phrase tempo ("Tempo (seg): ", 50, darkBlue, sf::Vector2f(WIDTH * 0.7, HEIGHT * 0.01));
     Phrase time ("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.83, HEIGHT * 0.01)); //Instânciando um objeto de tempo, onde será atualizado sempre que mudar os segundos;
@@ -574,13 +620,21 @@ void Jogo::gameWinScreen(Character character [6], Boat boat, Sprites background,
     Phrase tentativas("Tentativas: ", 50, darkBlue, sf::Vector2f(WIDTH * 0.20, HEIGHT * 0.01));
     Phrase attempts("0", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.33, HEIGHT * 0.01)); //Aqui são as tentativas, cada vez que o jogador perde soma-se 1 na quantidade;
 
-    std::cout << "Tentativas: " << gameData.numbAttempts << std::endl;
-    std::cout << "Total de Mov.: " << gameData.totalMoves << std::endl;
-    std::cout << "Movimentos: " << gameData.moves << std::endl;
-    std::cout << "Tempo: " << gameData.totalTime << std::endl;
+    Phrase fimDeJogo("SUCESSO! FIM DE JOGO!", 50, sf::Color::Yellow, sf::Vector2f(WIDTH * 0.347, HEIGHT * 0.19)); //Instanciando o fim de jogo, frase que ficará escrita no pequeno menu;
+    Phrase fimDeJogo1("SUCESSO! FIM DE JOGO!", 50, sf::Color::Blue, sf::Vector2f(WIDTH * 0.3451, HEIGHT * 0.19)); //Instanciando uma "sombra" para dar um efeito diferente na escrita;
+
+    Phrase continuar("Continuar", 40, sf::Color::White, sf::Vector2f(WIDTH * 0.45, HEIGHT * 0.70)); //Unica opção disponível nesse menu de finalizar o jogo;
 
     //Inicializando as texturas dos textos que agora foram inseridos no jogo, para mostrar o desempenho do jogador;
     if (!time.setFont("bin/afanan.ttf") || !tempo.setFont("bin/afanan.ttf") || !movimentos.setFont("bin/afanan.ttf") || !movements.setFont("bin/afanan.ttf") || !tentativas.setFont("bin/afanan.ttf") || !attempts.setFont("bin/afanan.ttf") || !movimentosTotais.setFont("bin/afanan.ttf") ||!totalMovements.setFont("bin/afanan.ttf")) 
+    {
+        std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
+
+        return;
+    }
+    
+    //Setando as fontes de fim de jogo e de continuar;
+    if (!fimDeJogo.setFont("bin/Pixel.ttf") || !fimDeJogo1.setFont("bin/Pixel.ttf") || !continuar.setFont("bin/Vegan.ttf"))
     {
         std::cout << "\n\n @@@@@@ Error trying to access the file." << std::endl;
 
@@ -598,18 +652,75 @@ void Jogo::gameWinScreen(Character character [6], Boat boat, Sprites background,
                 window.close();
 
             break;
+
+            case sf::Event::MouseMoved:
+                if (continuar.isHovering(mouse.getPosition(window))) //Caso o mouse fique em cima do continuar;
+                    continuar.text.setFillColor(sf::Color::Blue); //Muda a cor par azul;
+                else
+                    continuar.text.setFillColor(sf::Color::White); //Caso contrário, muda para branco;
+
+            break;
+
+            case sf::Event::MouseButtonPressed:
+                if (continuar.isHovering(mouse.getPosition(window))) //Se apertar retorna sem valor, dizendo que ele terminou o jogo e está pronto para ir ao menu;
+                    return;
+
+            break;
             }
         }
 
         window.clear(sf::Color::Black); //Limpa a tela e coloca uma cor inicial;
 
-        window.draw(background.sprite);
+        window.draw(background.sprite); //Printa o fundo do jogo;
 
-        if (printEverythingOneTime) {
-            gameData.printStatistics(time, movements, attempts, totalMovements);
+        if (printEverythingOneTime) { //Atualizando somente pela primeira vez;
+            gameData.printStatistics(time, movements, attempts, totalMovements); //Atualizando os dados do gameData;
 
             printEverythingOneTime = false;
         }
+
+        window.draw(boat.sprite); //Printando o barco;
+
+        for (int i = 0; i < NUMBEROFCHARS; i++) //Printando todos os personagens;
+            window.draw(character[i].sprite);
+
+        window.draw(whiteWindowOption.sprite); //Colocando a janela branca transparente;
+
+        //Printando as frases que serão apresentadas;
+        window.draw(fimDeJogo1.text);
+        window.draw(fimDeJogo.text);
+        window.draw(continuar.text);
+
+        if (moving == true) { //Caso esteja tendo a animação ainda, entra dentro dessas opções;
+            if (tentativas.text.getPosition().x <= XFINALATTEMPTS) { //Enquanto a palavra tentativass não chegou ainda no final da sua animação;
+                tentativas.text.move(sf::Vector2f(3.16, 3.3));
+                attempts.text.move(sf::Vector2f(3.16, 3.3));
+            } else
+                movingVerficator += 1; //Quando chegar avisa a variável;
+            
+            if (movimentos.text.getPosition().x >= XFINALMOVES) { //Enquanto movimentos não chegou ainda também em seu objetivo final;
+                movimentos.text.move(sf::Vector2f(-1.64, 4.25)); 
+                movements.text.move(sf::Vector2f(-1.64, 4.25));
+            } else
+                movingVerficator += 1;
+
+            if (tempo.text.getPosition().x >= XFINALTIME) { //Enquanto a palavra tempo não chegou no final da animação;
+                tempo.text.move(sf::Vector2f(-6.42, 4.95));
+                time.text.move(sf::Vector2f(-6.42, 4.95));
+            } else
+                movingVerficator += 1;
+
+            if (movimentosTotais.text.getPosition().x >= XFINALTOTALMOVES) { //Enquanto o movimentos totais não chegou no final da animação ainda;
+                movimentosTotais.text.move(sf::Vector2f(-1.62, 5.1));
+                totalMovements.text.move(sf::Vector2f(-1.62, 5.1));
+            } else
+                movingVerficator += 1;
+            
+
+            if (movingVerficator > 4) //Caso ele já tenha passado por todos, limita de entrar nesse laço para evitar repetições;
+                moving = false;
+        }
+
         //Fazendo os prints gerais do texto;
         window.draw(tempo.text);
         window.draw(time.text);
@@ -619,13 +730,6 @@ void Jogo::gameWinScreen(Character character [6], Boat boat, Sprites background,
         window.draw(attempts.text);
         window.draw(movimentosTotais.text);
         window.draw(totalMovements.text);
-
-        window.draw(boat.sprite);
-
-        for (int i = 0; i < NUMBEROFCHARS; i++)
-            window.draw(character[i].sprite);
-
-        window.draw(whiteWindowOption.sprite);
 
         window.display(); //Mostra novamente o que está sendo printado na tela;
     }

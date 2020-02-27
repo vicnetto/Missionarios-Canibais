@@ -46,6 +46,7 @@ GameData::GameData()
     numbAttempts = 0;
     rightSideCanibals = 3;
     rightSidePriests = 3;
+    totalMoves = 0;
 
     currentTime = 0;
     currentMoves = 0;
@@ -300,5 +301,4 @@ void GameData::resetStacksAndReplace (std::stack<sf::Vector2f> &leftSpaces, std:
     boat.sprite.setScale(0.5, 0.5);
     boat.brightsprite.setScale(0.5, 0.5);
 }
-
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -24,6 +24,7 @@ FUNÇÕES PÚBLICAS:
 dentro da classe Jogo.
 - int jogar () -> Essa função é a principal do jogo, pelo menos onde é chamado e organizado todas as verificações do jogo.
 - bool startScreen () -> Essa função tem como objetivo montar uma tela inicial, para preparar o jogador do início do jogo.
+- void gameWinScreen (...) -> Função com objetivo de mostrar a vitória ao jogador, com todos os seus dados necessários.
 
 */
 
@@ -34,9 +35,10 @@ class Jogo {
 
     public:
         int mainMenu ();
-        int start (GameData &gameData, std::stack<sf::Vector2f> &leftSpaces, std::stack<sf::Vector2f> &rightSpaces, std::stack<sf::Vector2f> &boatSpaces, bool isJustToPrint);
+        int start ();
         bool startScreen ();
         void gameWinScreen (Character character [6], Boat boat, Sprites background, Sprites whiteWindowOption, GameData gameData);
+        void instructions();
 };
 
 #endif /* JOGO_H */
