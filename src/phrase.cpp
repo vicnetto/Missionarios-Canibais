@@ -3,6 +3,7 @@
 #include <SFML/System.hpp>
 #include <bits/stdc++.h>
 
+
 #include "phrase.h"
 
 //---------------------------------------------------------- PHRASE -------------------------------------------------------------------------
@@ -25,6 +26,7 @@ Phrase::Phrase(std::string phrase, int scale, sf::Color color, sf::Vector2f posi
     text.setCharacterSize(scale);
     text.setFillColor(color);
     text.setPosition(position);
+    text.setScale(sf::Vector2f(0.5, 0.5));
 }
 
 /*

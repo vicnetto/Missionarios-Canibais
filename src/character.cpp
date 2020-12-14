@@ -58,6 +58,8 @@ void Character::setCharacter(bool isPriest, int location, sf::Vector2f scale, sf
 
     brightsprite.setScale(scale);
     brightsprite.setPosition(position);
+
+    bright = false;
 }
 
 /*

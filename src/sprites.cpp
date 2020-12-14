@@ -5,7 +5,6 @@
 
 #include "sprites.h"
 
-
 //-------------------------------------------------------- SPRITES ---------------------------------------------------------------------------
 
 /*
@@ -36,7 +35,7 @@ Sprites::Sprites(sf::Vector2f size, sf::Vector2f position)
 */
 Sprites::Sprites(sf::Vector2f scale, sf::Vector2f position)
 {
-    sprite.setScale(scale);
+    sprite.setScale(scale.x * 0.5, scale.y * 0.5);
     sprite.setPosition(position);
 }
 

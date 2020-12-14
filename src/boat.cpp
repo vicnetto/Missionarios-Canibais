@@ -46,6 +46,8 @@ Boat::Boat(bool isOnTheLeft, int quantChar, sf::Vector2f scale, sf::Vector2f pos
     brightsprite.setScale(scale);
     brightsprite.setPosition(position);
 
+    bright = false;
+
     xfinal = 0;
     xinitial = 0;
     speed = 0;

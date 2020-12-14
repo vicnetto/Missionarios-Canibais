@@ -5,7 +5,6 @@
 #include "jogo.h"
 
 int main () {
-
     Jogo jogo; //Iniciando com a instância do jogo, onde todas as funções serão chamadas;
 
     jogo.window.create(sf::VideoMode(WIDTH, HEIGHT), "Missionarios e Canibais", sf::Style::Default); //Colocando os nomes e algumas configurações na janela;

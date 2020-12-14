@@ -24,6 +24,7 @@ FUNÇÕES PÚBLICAS:
 */
 class Phrase 
 {
+
     public:
         sf::Text text;
         sf::Font font;

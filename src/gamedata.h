@@ -10,7 +10,8 @@
 #include "character.h"
 #include "boat.h"
 
-
+#define WIDTH 960 
+#define HEIGHT 540
 
 /*
 

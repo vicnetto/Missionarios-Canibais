@@ -41,7 +41,6 @@
 sf::Color darkBlue (0,72,186); //Colocando uma cor mais harmoniosa no jogo;
 sf::Color brown (150, 75, 0); //Setando a cor para utilizala no men;
 
-
 //--------------------------------------------------------- JOGO --------------------------------------------------------------------------
 
 /*
@@ -536,7 +535,7 @@ int Jogo::start () {
 
         if (winOrLose == WIN || winOrLose == LOSE) { //Agora sim comparando o resultado para ver vitória ou derrota;
             if (winOrLose == LOSE) { //Caso seja uma derrota
-                window.draw(whiteWindowOption.sprite); //Deseja a janela transparente;
+                window.draw(whiteWindowOption.sprite); //Desenha a janela transparente;
 
                 gameData.gameOverScreen(window); //Faz a opção de jogar novamente;
 
@@ -573,9 +572,6 @@ int Jogo::start () {
 
         window.display(); //Mostrando quais foram as alterações no fundo;
     }
-
-
-
 
     return 0;
 }

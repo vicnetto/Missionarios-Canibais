@@ -27,6 +27,7 @@ função da classe Sprites, porém com variáveis diferentes.
 - bool isHovering () -> Essa função é exatamente a mesma da classe Phrases, mas com uma diferença mínima que se trata de sprites.
 
 */
+
 class Sprites
 {
     public:
